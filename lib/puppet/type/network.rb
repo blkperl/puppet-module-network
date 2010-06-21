@@ -24,9 +24,55 @@ Puppet::Type.newtype(:network) do
      end
 
      # Start device on boot
-     newparam(:onboot) do
+     newproperty(:onboot) do
       desc "Start the network device on boot" 
       newvalue(:yes, :no)
-      defaultto :yes
+      defaultto(:yes)
      end
+
+     # Netmask
+     newproperty(:netmask) do
+       desc "Configure the netmask of the device"
+       defaultto(255.255.255.0)
+     end
+     
+    # Network
+     newproperty(:network) do
+       desc "Configure the network of the device"
+     end
+    
+    # Broadcast
+     newproperty(:broadcast) do
+       desc "Configure the broadcast of the device"
+     end
+
+     # IP Address
+     newproperty(:ipaddr) do
+       desc "Configure the IP address of the device"
+     end
+
+     # Gateway
+     newproperty(:gateway) do
+       desc "Configure the Gateway of the device"
+     end
+
+     # Hardware address
+     newproperty(:hwaddr) do
+       desc "Hardware address of the device"
+     end
+     
+     # Domain
+     newproperty(:domain) do
+       desc "Configure the domain of the device"
+     end
+
+     # USERCTL
+     newproperty(:userctl) do
+       desc "Non root users are allowed to control device if set to yes"
+       newvalue(:yes, :no)
+       defaultto(:no)
+     end
+
+    
+
 end 

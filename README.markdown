@@ -22,16 +22,16 @@ Usage
 
 This is the full specification::
 
-   # network
+   # Network
 
-   network { "default":
+      network { "default":
 
-   networking => yes | no			     #default is yes
-   hostname   => example.hostname
+      networking => yes | no			    #default is yes
+      hostname   => example.hostname
 
    }
 
-  # device configuration
+  # Device configuration
       network_device { "name":
         desc                => "eth0" | "eth1",
 
@@ -41,6 +41,7 @@ This is the full specification::
       onboot                => yes  | no	      
       network               => XXX.XXX.XXX.XXX
       netmask               => 255.255.255.0          
+      broadcast             => XXX.XXX.XXX.XXX
       ipaddr                => XXX.XXX.XXX.XXX        
       userctl               => yes | no
       gateway               => XXX.XXX.XXX.XXX        
