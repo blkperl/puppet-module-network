@@ -33,21 +33,19 @@ This is the full specification::
 
   # Device configuration
       network_device { "name":
-        desc                => "eth0" | "eth1",
-
-  # Basic Configuration
-      device                => eth0 | eth1	      
-      bootprto              => none | static | dhcp   
-      onboot                => yes  | no	      
-      network               => XXX.XXX.XXX.XXX
-      netmask               => 255.255.255.0          
-      broadcast             => XXX.XXX.XXX.XXX
-      ipaddr                => XXX.XXX.XXX.XXX        
-      userctl               => yes | no
-      gateway               => XXX.XXX.XXX.XXX        
-      hwaddr                => XX:XX:XX:XX:XX:XX
-      domain                => example.domain.com
-      ensure                => present | up | down | absent  
+        desc                => "eth0" | "eth1"
+        device                => eth0 | eth1	      
+        bootproto             => none | static | dhcp   
+        onboot                => yes  | no	      
+        network               => XXX.XXX.XXX.XXX
+        netmask               => 255.255.255.0          
+        broadcast             => XXX.XXX.XXX.XXX
+        ipaddr                => XXX.XXX.XXX.XXX        
+        userctl               => yes | no
+        gateway               => XXX.XXX.XXX.XXX        
+        hwaddr                => XX:XX:XX:XX:XX:XX
+        domain                => example.domain.com
+        ensure                => present | up | down | absent  
    }
 
   # ensure => up, implies onboot => yes

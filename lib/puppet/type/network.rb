@@ -1,23 +1,26 @@
 Puppet::Type.newtype(:network) do
-    desc "The network managment configuration type"
+    @doc = "The network managment configuration type"
 
     # Ensure
-     ensurable do
-
-     newvalue(:present, :up, :down, :absent)     
+     newparam(:ensure) do
+      desc "Device can be present, up, down, or absent"
+      newvalue(:present, :up, :down, :absent)     
     
-      # Devices have names
-      newparam(:device) do
+      defaultto(:absent) 
+    end
+
+     # Devices have names
+     newparam(:device) do
+       isnamevar
        desc "The network device to be configured"
          validate do |value|
            unless value =~ /^\w+/
             raise ArguementError, "%s is not a valid device name" % value
        	 end
-      end
-    end
-
+     end
+     
      # Boot Prioty should default to dhcp
-     newproperty(:bootprto) do
+     newproperty(:bootproto) do
 	desc "Boot priority for the network device"
         newvalue(:dhcp, :static, :none)
 	defaultto(:dhcp)     
@@ -33,7 +36,7 @@ Puppet::Type.newtype(:network) do
      # Netmask
      newproperty(:netmask) do
        desc "Configure the netmask of the device"
-       defaultto(255.255.255.0)
+       defaultto("255.255.255.0")
      end
      
     # Network
@@ -72,7 +75,5 @@ Puppet::Type.newtype(:network) do
        newvalue(:yes, :no)
        defaultto(:no)
      end
-
-    
 
 end 
