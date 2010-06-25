@@ -1,35 +1,63 @@
+require 'puppet'
+
+module Puppet
+
 Puppet::Type.newtype(:network) do
     @doc = "The network managment configuration type"
 
     # Ensure
-     newparam(:ensure) do
-      desc "Device can be present, up, down, or absent"
-      newvalue(:present, :up, :down, :absent)     
+     newproperty(:ensure) do
+      desc "Device can be present, up, down, or absent
+
+            present: 
+                 - creates/parses the config file, ignores the state
+            up:
+                 - creates/parses the config file, makes sure the device is up
+            down:
+                 - creates/parses the config file, makes sure the device is down
+            absent
+                 - ignores the config file, makes sure the device is down"
+
+      newvalue(:present) do
+         provider.create
+      end     
     
+      newvalue(:up) do
+         provider.up
+      end     
+      
+      newvalue(:down) do
+         provider.down
+      end     
+      
+      newvalue(:absent) do
+         provider.absent
+      end
+     
       defaultto(:absent) 
+
     end
 
      # Devices have names
      newparam(:device) do
        isnamevar
        desc "The network device to be configured"
-         validate do |value|
-           unless value =~ /^\w+/
-            raise ArguementError, "%s is not a valid device name" % value
-       	 end
      end
      
      # Boot Prioty should default to dhcp
      newproperty(:bootproto) do
 	desc "Boot priority for the network device"
-        newvalue(:dhcp, :static, :none)
+        newvalue(:dhcp)
+        newvalue(:static)
+        newvalue(:none)
 	defaultto(:dhcp)     
      end
 
      # Start device on boot
      newproperty(:onboot) do
       desc "Start the network device on boot" 
-      newvalue(:yes, :no)
+      newvalue(:yes)
+      newvalue(:no)
       defaultto(:yes)
      end
 
@@ -72,8 +100,11 @@ Puppet::Type.newtype(:network) do
      # USERCTL
      newproperty(:userctl) do
        desc "Non root users are allowed to control device if set to yes"
-       newvalue(:yes, :no)
+       newvalue(:yes)
+       newvalue(:no)
        defaultto(:no)
      end
+
+end
 
 end 

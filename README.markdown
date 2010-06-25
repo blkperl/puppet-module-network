@@ -22,18 +22,8 @@ Usage
 
 This is the full specification::
 
-   # Network
-
-      network { "default":
-
-      networking => yes | no			    #default is yes
-      hostname   => example.hostname
-
-   }
-
   # Device configuration
-      network_device { "name":
-        desc                => "eth0" | "eth1"
+      network  { "name":
         device                => eth0 | eth1	      
         bootproto             => none | static | dhcp   
         onboot                => yes  | no	      
