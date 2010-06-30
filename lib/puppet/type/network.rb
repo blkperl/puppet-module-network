@@ -5,8 +5,7 @@ module Puppet
 Puppet::Type.newtype(:network) do
     @doc = "The network managment configuration type"
 
-    # Ensure
-     newproperty(:ensure) do
+     ensurable do
       desc "Device can be present, up, down, or absent
 
             present: 
@@ -18,6 +17,8 @@ Puppet::Type.newtype(:network) do
             absent
                  - ignores the config file, makes sure the device is down"
 
+      defaultvalues    
+ 
       newvalue(:present) do
          provider.create
       end     
@@ -36,6 +37,10 @@ Puppet::Type.newtype(:network) do
      
       defaultto(:absent) 
 
+      def retrieve 
+         provider.status
+      end 
+
     end
 
      # Devices have names
@@ -47,17 +52,14 @@ Puppet::Type.newtype(:network) do
      # Boot Prioty should default to dhcp
      newproperty(:bootproto) do
 	desc "Boot priority for the network device"
-        newvalue(:dhcp)
-        newvalue(:static)
-        newvalue(:none)
+        newvalues(:dhcp, :static, :none)
 	defaultto(:dhcp)     
      end
 
      # Start device on boot
      newproperty(:onboot) do
       desc "Start the network device on boot" 
-      newvalue(:yes)
-      newvalue(:no)
+      newvalues(:yes, :no)
       defaultto(:yes)
      end
 
@@ -100,8 +102,7 @@ Puppet::Type.newtype(:network) do
      # USERCTL
      newproperty(:userctl) do
        desc "Non root users are allowed to control device if set to yes"
-       newvalue(:yes)
-       newvalue(:no)
+       newvalues(:yes, :no)
        defaultto(:no)
      end
 
