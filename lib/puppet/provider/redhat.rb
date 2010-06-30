@@ -2,6 +2,8 @@ Puppet::Type.type(:network).provide(:redhat) do
    desc "Provider for redhat network interfaces"
 
    defaultfor :operatingsystem => [:redhat, :fedora, :centos]
+ 
+   has_features :manages_userctl
 
    def create
      Puppet.debug "Configuring network interface " % [@resource[:name]]

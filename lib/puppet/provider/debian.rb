@@ -2,6 +2,8 @@ Puppet::Type.type(:network).provide(:debian) do
    desc "Provider for debian network interfaces"
 
    defaultfor :operatingsystem => [:debian, :ubuntu]
+   
+   has_features :manages_userctl
 
    commands :ifconfig => "/sbin/ifconfig -a"
    commands :ip => "/sbin/ip link ls"
