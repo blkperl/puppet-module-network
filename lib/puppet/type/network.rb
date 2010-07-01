@@ -5,6 +5,12 @@ module Puppet
 Puppet::Type.newtype(:network) do
     @doc = "The network managment configuration type"
 
+     # Devices have names
+     newparam(:device) do
+       isnamevar
+       desc "The network device to be configured"
+     end
+
      ensurable do
       desc "Device can be present, up, down, or absent
 
@@ -42,12 +48,6 @@ Puppet::Type.newtype(:network) do
       end 
 
     end
-
-     # Devices have names
-     newparam(:device) do
-       isnamevar
-       desc "The network device to be configured"
-     end
      
      # Boot Prioty should default to dhcp
      newproperty(:bootproto) do
