@@ -10,19 +10,20 @@ Puppet::Type.type(:network).provide(:debian) do
    
    def create
      Puppet.debug "Configuring network interface " % [@resource[:name]]
+     self.device_up
    end
  
    def up
-     Puppet.debug "Bringing network interface up " % [@resource[:name]]
-     
+    self.device_up 
    end
  
    def down
-     Puppet.debug "Bringing network interface down " % [@resource[:name]]
+    self.device_down
    end 
 
    def absent
      Puppet.debug "Making sure network interface is absent " % [@resource[:name]]
+     self.device_down
    end
 
    # FIXME - need to grep ip link ls [@resource[:name]]
@@ -51,6 +52,27 @@ Puppet::Type.type(:network).provide(:debian) do
        end
 
    end
-  
+   
+   # Bring network interface up
+   # TODO catch excpetions
+   def device_up
+     if status == "UP"
+       ip [@resource[:name]] "up"
+       Puppet.debug "Bringing network interface up " % [@resource[:name]]
+     else
+       Puppet.debug "Network interface is already down" % [@resource[:name]]
+     end
+   end
+
+   # Bring network interface down
+   # TODO catch exceptions
+   def device_down
+     if status == "UP"
+       ip [@resource[:name]] "down"
+       Puppet.debug "Bringing network interface down " % [@resource[:name]]
+     else
+       Puppet.debug "Network interface is already down" % [@resource[:name]]
+     end
+   end
 
 end
