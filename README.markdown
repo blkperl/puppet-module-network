@@ -20,6 +20,8 @@ control system and running:
 Usage
 -----
 
+Currently only supports redhat and debian based OS's
+
 This is the full specification::
 
   # Device configuration
@@ -38,12 +40,13 @@ This is the full specification::
         ensure                => present | up | down | absent  
    }
 
-  # ensure => up, implies onboot => yes
-  # ensure => down, implies onboot => no
+  *  # ensure => up, implies onboot => yes
+  *  # ensure => down, implies onboot => no
 
 TODO
 ----
-Add support for wireless interfaces
-Add support for static routes
-Add support for vlan tagging
-Add support for bridging
+
+  *  Add support for wireless interfaces
+  *  Add support for static routes
+  *  Add support for vlan tagging
+  *  Add support for bridging
