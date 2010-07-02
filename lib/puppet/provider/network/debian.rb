@@ -5,8 +5,8 @@ Puppet::Type.type(:network).provide(:debian) do
    
    has_features :manages_userctl
 
-   commands :ifconfig => "/sbin/ifconfig -a"
-   commands :ip => "/sbin/ip link ls"
+   commands :ifconfig => "/sbin/ifconfig"
+   commands :ip => "/sbin/ip"
    
    def create
      Puppet.debug "Configuring network interface " % [@resource[:name]]
@@ -26,12 +26,12 @@ Puppet::Type.type(:network).provide(:debian) do
      self.device_down
    end
 
-   # FIXME - need to grep ip link ls [@resource[:name]]
+   # FIXME - need to parse a command or config file 
    def exists?
      return true 
    end 
    
-   # FIXME - need to grep ifconfig -a
+   # FIXME - need to parse a command or config file
    def state
      return true
    end
@@ -48,19 +48,19 @@ Puppet::Type.type(:network).provide(:debian) do
           end 
        else
           Puppet.debug "Interface is absent " %s [@resource[:name]]
-          return "absent"
+          return "ABSENT"
        end
 
    end
    
    # Bring network interface up
-   # TODO catch excpetions
+   # TODO catch exceptions
    def device_up
-     if status == "UP"
-       ip [@resource[:name]] "up"
-       Puppet.debug "Bringing network interface up " % [@resource[:name]]
+     if status == "DOWN"
+       ip "link set"[@resource[:name]] "up"
+       Puppet.debug "Bringing network interface up " %s [@resource[:name]]
      else
-       Puppet.debug "Network interface is already down" % [@resource[:name]]
+       Puppet.debug "Network interface is already up" %s [@resource[:name]]
      end
    end
 
@@ -68,10 +68,10 @@ Puppet::Type.type(:network).provide(:debian) do
    # TODO catch exceptions
    def device_down
      if status == "UP"
-       ip [@resource[:name]] "down"
-       Puppet.debug "Bringing network interface down " % [@resource[:name]]
+       ip "link set" [@resource[:name]] "down"
+       Puppet.debug "Bringing network interface down " %s [@resource[:name]]
      else
-       Puppet.debug "Network interface is already down" % [@resource[:name]]
+       Puppet.debug "Network interface is already down" %s [@resource[:name]]
      end
    end
 

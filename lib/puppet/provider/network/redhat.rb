@@ -5,29 +5,33 @@ Puppet::Type.type(:network).provide(:redhat) do
  
    has_features :manages_userctl
 
+   commands :ip => "/sbin/ip"
+
    def create
      Puppet.debug "Configuring network interface " % [@resource[:name]]
+     self.device_up
    end
  
    def up
-     Puppet.debug "Bringing network interface up " % [@resource[:name]]
-     
+     self.device_up
    end
  
    def down
-     Puppet.debug "Bringing network interface down " % [@resource[:name]]
+     self.device_down
    end 
 
    def absent
      Puppet.debug "Making sure network interface is absent " % [@resource[:name]]
+     self.device_down
    end
 
-   # FIXME - need to grep ip link ls [@resource[:name]]
+   # FIXME - Use a command or validate existence of config file or both
    def exists?
      return true 
    end 
    
-   # FIXME - need to grep ifconfig -a
+   # FIXME 
+   # Either parse the config file or use a command's output
    def state
      return true
    end
@@ -49,5 +53,26 @@ Puppet::Type.type(:network).provide(:redhat) do
 
    end
   
+   # TODO catch exceptions
+   def device_up
+     if status == "DOWN"
+       ip "link set" [@resource[:name]] "up"
+       Puppet.debug "Bringing network interface up" %s [@resource[:name]]
+     else
+       Puppet.debug "The network interface is already up" %s [@resource[:name]]
+     end
+   end
+
+   # TODO catch exceptions
+   def device_down
+     if status == "UP"
+       ip "link set" [@resource[:name]] "down"
+       Puppet.debug "Bringing network interface down" %s [@resource[:name]]
+     else
+       Puppet.debug "The network interface is already down" %s [@resource[:name]]
+     end
+   end
 
 end
+
+
