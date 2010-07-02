@@ -8,7 +8,7 @@ Puppet::Type.type(:network).provide(:redhat) do
    commands :ip => "/sbin/ip"
 
    def create
-     Puppet.debug "Configuring network %s" % [@resource[:name]
+     Puppet.debug "Configuring network %s" % [@resource[:name]]
      self.device_up
    end
  
@@ -56,7 +56,7 @@ Puppet::Type.type(:network).provide(:redhat) do
    # TODO catch exceptions
    def device_up
      if status == "DOWN"
-       ip "link set" [@resource[:name]] "up"
+       ip('link set', @resource[:name], 'up')
        Puppet.debug "Bringing %s up" % [@resource[:name]]
      else
        Puppet.debug " %s is already up" % [@resource[:name]]
@@ -66,7 +66,7 @@ Puppet::Type.type(:network).provide(:redhat) do
    # TODO catch exceptions
    def device_down
      if status == "UP"
-       ip "link set" [@resource[:name]] "down"
+       ip('link set', @resource[:name], 'down')
        Puppet.debug "Bringing %s down" % [@resource[:name]]
      else
        Puppet.debug "%s is already down" % [@resource[:name]]
