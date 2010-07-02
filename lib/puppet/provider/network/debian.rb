@@ -9,7 +9,7 @@ Puppet::Type.type(:network).provide(:debian) do
    commands :ip => "/sbin/ip"
    
    def create
-     Puppet.debug "Configuring network interface " % [@resource[:name]]
+     Puppet.debug "Configuring %s " % [@resource[:name]]
      self.device_up
    end
  
@@ -22,7 +22,7 @@ Puppet::Type.type(:network).provide(:debian) do
    end 
 
    def absent
-     Puppet.debug "Making sure network interface is absent " % [@resource[:name]]
+     Puppet.debug "Making sure %s is absent " % [@resource[:name]]
      self.device_down
    end
 
@@ -40,14 +40,14 @@ Puppet::Type.type(:network).provide(:debian) do
    def status
        if exists?
           if state
-            Puppet.debug "Interface state is UP " %s [@resource[:name]]
+            Puppet.debug "%s state is UP " % [@resource[:name]]
             return "UP"
           else
-            Puppet.debug "Interface state is DOWN " %s [@resource[:name]]
+            Puppet.debug "%s state is DOWN " % [@resource[:name]]
             return "DOWN"
           end 
        else
-          Puppet.debug "Interface is absent " %s [@resource[:name]]
+          Puppet.debug "%s is absent " % [@resource[:name]]
           return "ABSENT"
        end
 
@@ -58,9 +58,9 @@ Puppet::Type.type(:network).provide(:debian) do
    def device_up
      if status == "DOWN"
        ip "link set"[@resource[:name]] "up"
-       Puppet.debug "Bringing network interface up " %s [@resource[:name]]
+       Puppet.debug "Bringing %s up " % [@resource[:name]]
      else
-       Puppet.debug "Network interface is already up" %s [@resource[:name]]
+       Puppet.debug "%s is already up" % [@resource[:name]]
      end
    end
 
@@ -69,9 +69,9 @@ Puppet::Type.type(:network).provide(:debian) do
    def device_down
      if status == "UP"
        ip "link set" [@resource[:name]] "down"
-       Puppet.debug "Bringing network interface down " %s [@resource[:name]]
+       Puppet.debug "Bringing %s down " % [@resource[:name]]
      else
-       Puppet.debug "Network interface is already down" %s [@resource[:name]]
+       Puppet.debug "%s is already down" % [@resource[:name]]
      end
    end
 
