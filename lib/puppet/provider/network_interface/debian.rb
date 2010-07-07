@@ -1,4 +1,4 @@
-Puppet::Type.type(:network).provide(:debian) do
+Puppet::Type.type(:network_interface).provide(:debian) do
 	desc "Provider for debian network interfaces"
 
 	defaultfor :operatingsystem => [:debian, :ubuntu]

@@ -1,4 +1,4 @@
-Puppet::Type.type(:network).provide(:redhat) do
+Puppet::Type.type(:network_interface).provide(:redhat) do
 	desc "Provider for redhat network interfaces"
 
 	defaultfor :operatingsystem => [:redhat, :fedora, :centos]
