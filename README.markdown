@@ -25,7 +25,7 @@ Currently only supports redhat and debian based OS's
 This is the full specification::
 
   # Device configuration
-      network  { "eth0":
+      network_interface  { "eth0":
         bootproto             => none | static | dhcp   
         onboot                => yes  | no	      
         network               => XXX.XXX.XXX.XXX

@@ -1,7 +1,7 @@
 
 class puppet-network {
 
-	network { "eth0":    
+	network_interface { "eth0":    
 		ensure => down,
 	}
 

@@ -1,7 +1,7 @@
 
 class network-example {
 
-	network { "eth0":
+	network_interface { "eth0":
 		bootproto 	=> dhcp,
 		onboot 		=> yes,
 		netmask		=> 255.255.255.0,
@@ -14,7 +14,7 @@ class network-example {
 		ensure 		=> up,
 	}
 
-	network { "eth1":
+	network_interface { "eth1":
 		bootproto 	=> static,
 		onboot 		=> no,
 		netmask		=> 255.255.255.0,

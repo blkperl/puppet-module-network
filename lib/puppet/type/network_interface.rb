@@ -2,7 +2,7 @@ require 'puppet'
 
 module Puppet
 
-	Puppet::Type.newtype(:network) do
+	Puppet::Type.newtype(:network_interface) do
 		@doc = "The network managment configuration type"
 
 		# Devices have names
