@@ -29,7 +29,7 @@ Puppet::Type.type(:network).provide(:debian) do
 	def exists?
 		ip('link', 'list',  @resource[:name])
 	rescue Puppet::ExecutionFailure
-		raise Puppet::Error, "Network interface #{@resouce[:name]} does not exist"
+		raise Puppet::Error, "Network interface %s does not exist" % @resource[:name]
 	end 
 
     # Parses the ip command for the word UP
