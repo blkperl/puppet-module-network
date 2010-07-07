@@ -25,8 +25,7 @@ Currently only supports redhat and debian based OS's
 This is the full specification::
 
   # Device configuration
-      network  { "name":
-        device                => eth0 | eth1	      
+      network  { "eth0":
         bootproto             => none | static | dhcp   
         onboot                => yes  | no	      
         network               => XXX.XXX.XXX.XXX
