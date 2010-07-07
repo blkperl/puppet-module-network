@@ -25,22 +25,23 @@ Puppet::Type.type(:network).provide(:debian) do
 		self.device_down
 	end
 
+	# Uses the ip command to determine if the device exists
 	def exists?
 		ip('link', 'list',  @resource[:name])
 	rescue Puppet::ExecutionFailure
 		raise Puppet::Error, "Network interface #{@resouce[:name]} does not exist"
 	end 
 
-	# FIXME - need to parse a command or config file
-	# Puppet won't be able to a bring a device up until i fix this
-    def state
-		return true
+    # Parses the ip command for the word UP
+	def isUP?
+		lines = ip('link', 'list', @resource[:name])
+		return lines.include?("UP")
 	end
 
 	# up | down | absent
 	def status
 		if exists?
-			if state
+			if isUP?
 				Puppet.debug "%s state is UP " % [@resource[:name]]
    				return "UP"
  			else
