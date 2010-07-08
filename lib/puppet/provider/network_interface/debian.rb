@@ -9,7 +9,6 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 
 	def create
 		Puppet.debug "Configuring %s " % [@resource[:name]]
-		self.device_up
 	end
 
 	def up
@@ -33,7 +32,7 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 	end 
 
     # Parses the ip command for the word UP
-	def isUP?
+	def is_up?
 		lines = ip('link', 'list', @resource[:name])
 		return lines.include?("UP")
 	end
@@ -41,22 +40,22 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 	# up | down | absent
 	def status
 		if exists?
-			if isUP?
-				Puppet.debug "%s state is UP " % [@resource[:name]]
-   				return "UP"
+			if is_up?
+				Puppet.debug "%s state is up " % [@resource[:name]]
+   				return "up"
  			else
-				Puppet.debug "%s state is DOWN " % [@resource[:name]]
-				return "DOWN"
+				Puppet.debug "%s state is down " % [@resource[:name]]
+				return "down"
   			end 
 		else
   			Puppet.debug "%s is absent " % [@resource[:name]]
-  			return "ABSENT"
+  			return "absent"
 		end
 	end
 
 	# Two cases device down, device already up
 	def device_up
-		if status == "DOWN"
+		if status == "down"
 			ip('link', 'set', @resource[:name], 'up')
 			Puppet.debug "Bringing %s up " % [@resource[:name]]
 		else
@@ -66,12 +65,17 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 
 	# Two cases, device up, device already down
 	def device_down
-		if status == "UP"
+		if status == "up"
 			ip('link', 'set', @resource[:name], 'down')
 			Puppet.debug "Bringing %s down " % [@resource[:name]]
 		else
 			Puppet.debug "%s is already down" % [@resource[:name]]
 		end
+	end
+
+	#Parses the interface's config file
+	def parse_config_file
+
 	end
 
 end
