@@ -90,10 +90,10 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 			end
 			Puppet.debug "Imported config file to a hash"
 			
-			#@property_hash.merge(config_hash)
-			#self.write_config_hash(@resource[:value], '/etc/puppet/test2.txt')	
+			resource.merge(config_hash)
+			self.write_config_hash(resource, '/etc/puppet/test2.txt')	
 			
-			if (@property_hash == config_hash)
+			if (resource == config_hash)
 				Puppet.debug "Config file is in sync"
 			else
 				Puppet.debug "Config file in not in sync"
