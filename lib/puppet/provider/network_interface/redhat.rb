@@ -73,9 +73,35 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 		end
 	end
 	
-	# Parses the interface's config file
-	def parse_config_file
+	# Checks state of the config file
+	def generate_config_hash
+		file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
+		config_hash = {}
+		if File.exist?(file)
+			lines = File.new(file, 'r').readlines
+			
+			lines.each do |line|
+				config_hash[lines.split('=')[0].strip] = line.split('=')[1].strip } 
+			end
 		
+			@resource.merge(config_hash)
+			
+			if (@resource == config_hash)
+				Puppet.debug "Config file is in sync"
+			else
+				Puppet.debug "Config file in not in sync"
+				self.write_config_hash(@resource, file)
+			end
+		else
+			Puppet.debug "Puppet was looking for " + file + " and coundn't find it"
+			raise Puppet::Error, "Puppet can't find %s config file" % @resource[:name]
+		end
+	end
+
+	# Dumps the interface's config file
+	def write_config_hash(config_hash, filename)
+		config_file = File.new(filename, 'w')
+		hash.each_pair{ |key, value| config_file.write(key + value.nil? ? '=' + value : "") } 
 	end
 
 end
