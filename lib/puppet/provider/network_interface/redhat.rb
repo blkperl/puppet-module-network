@@ -9,9 +9,11 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 
 	def create
 		Puppet.debug "Configuring network %s" % [@resource[:name]]
+		self.read_config
 	end
 
 	def up
+		self.read_config
 		self.device_up
 	end
 
@@ -39,6 +41,7 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 
 	# up | down | absent
 	def status
+		Puppet.debug "Puppet is attempting to determine the state of %s" % @resource[:name]
 		if exists?
   			if is_up?
 				Puppet.debug "%s state is up " % [@resource[:name]]
@@ -55,7 +58,7 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 
 	# Two cases, device down, device already up
 	def device_up
-		if status == "down"
+		if status.downcase == "down"
 			ip('link', 'set', @resource[:name], 'up')
 			Puppet.debug "Bringing %s up" % [@resource[:name]]
 		else
@@ -65,32 +68,36 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 
 	# Two cases, device up, device already down
 	def device_down
-		if status == "up"
+		if status.downcase == "up"
 			ip('link', 'set', @resource[:name], 'down')
 			Puppet.debug "Bringing %s down" % [@resource[:name]]
 		else
 			Puppet.debug "%s is already down" % [@resource[:name]]
 		end
 	end
+
 	
 	# Checks state of the config file
-	def generate_config_hash
+	# Havn't figured out how to get the values in @resource yet
+	def read_config
 		file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
 		config_hash = {}
 		if File.exist?(file)
 			lines = File.new(file, 'r').readlines
 			
 			lines.each do |line|
-				config_hash[lines.split('=')[0].strip] = line.split('=')[1].strip } 
+				config_hash[line.split('=')[0]] = line.split('=')[1] 
 			end
-		
-			@resource.merge(config_hash)
+			Puppet.debug "Imported config file to a hash"
 			
-			if (@resource == config_hash)
+			#@property_hash.merge(config_hash)
+			#self.write_config_hash(@resource[:value], '/etc/puppet/test2.txt')	
+			
+			if (@property_hash == config_hash)
 				Puppet.debug "Config file is in sync"
 			else
 				Puppet.debug "Config file in not in sync"
-				self.write_config_hash(@resource, file)
+				self.write_config_hash(config_hash, '/etc/puppet/test.txt')
 			end
 		else
 			Puppet.debug "Puppet was looking for " + file + " and coundn't find it"
@@ -98,10 +105,11 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 		end
 	end
 
-	# Dumps the interface's config file
+	# Dumps the interface's config hash into the selected file
 	def write_config_hash(config_hash, filename)
 		config_file = File.new(filename, 'w')
-		hash.each_pair{ |key, value| config_file.write(key + value.nil? ? '=' + value : "") } 
+		config_hash.each_pair{ |key, value| config_file.write(value.nil? ? "" : key + '='+ value) } 
+		Puppet.debug "Wrote to #{filename}"
 	end
 
 end
