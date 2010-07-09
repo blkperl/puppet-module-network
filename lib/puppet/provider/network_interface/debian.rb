@@ -21,7 +21,6 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 
 	def absent
 		Puppet.debug "Making sure %s is absent " % [@resource[:name]]
-		self.device_down
 	end
 
 	# Uses the ip command to determine if the device exists
@@ -40,13 +39,21 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 	# up | down | absent
 	def status
 		if exists?
-			if is_up?
-				Puppet.debug "%s state is up " % [@resource[:name]]
-   				return "up"
- 			else
-				Puppet.debug "%s state is down " % [@resource[:name]]
-				return "down"
-  			end 
+			if @resource[:ensure].to_s == "present"
+				Puppet.debug "%s state is present" % [@resource[:name]]
+				return "present"
+			elsif @resource[:ensure].to_s == "absent"
+  				Puppet.debug "%s is absent " % [@resource[:name]]
+  				return "absent"
+			else
+				if is_up?
+					Puppet.debug "%s state is up " % [@resource[:name]]
+					return "up"
+				else
+					Puppet.debug "%s state is down " % [@resource[:name]]
+					return "down"
+				end
+			end 
 		else
   			Puppet.debug "%s is absent " % [@resource[:name]]
   			return "absent"
