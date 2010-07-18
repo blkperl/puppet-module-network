@@ -1,31 +1,38 @@
 Puppet::Type.type(:network_interface).provide(:redhat) do
 	desc "Provider for redhat network interfaces"
 
+	confine :operatingsystem => [:redhat, :fedora, :centos]
 	defaultfor :operatingsystem => [:redhat, :fedora, :centos]
 
 	has_features :manages_userctl
-
+	
+	@modified = false
+	Config_file = "/etc/sysconfig/network-scripts/ifcfg-eth0"
 	commands :ip => "/sbin/ip"
 
+	# Manages the config file
 	def create
 		Puppet.debug "Configuring network %s" % [@resource[:name]]
-		self.read_config
+		self.write_config()
 	end
 
+	# Ensures state is up & device is configured
 	def up
 		self.read_config
 		self.device_up
 	end
 
+	# Ensures state is down & device is configured
 	def down
 		self.device_down
 	end 
 
+	# Ensures puppet ignores this network interface
 	def absent
 		Puppet.debug "Making sure %s is absent " % [@resource[:name]]
 	end
 
-    # Uses the ip command to determine if the device exists
+    	# Uses the ip command to determine if the device exists
 	def exists?
 		ip('link', 'list', @resource[:name])
 	rescue Puppet::ExecutionFailure
@@ -38,11 +45,11 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 		return lines.include?("UP")
 	end
 
-	# up | down | absent
+	# present | up | down | absent
 	def status
 		if exists?
-			if @resource[:ensure].to_s == "present"
-                                Puppet.debug "%s state is present" % [@resource[:name]]
+			if @resource[:ensure].to_s == "present" && @modified == false
+				Puppet.debug "%s state is present" % [@resource[:name]]
                                 return "present"
                         elsif @resource[:ensure].to_s == "absent"
                                 Puppet.debug "%s is absent " % [@resource[:name]]
@@ -82,41 +89,125 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 		end
 	end
 
-	
-	# Checks state of the config file
-	# Havn't figured out how to get the values in @resource yet
-	def read_config
-		file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
-		config_hash = {}
-		if File.exist?(file)
-			lines = File.new(file, 'r').readlines
-			
-			lines.each do |line|
-				config_hash[line.split('=')[0]] = line.split('=')[1] 
-			end
-			Puppet.debug "Imported config file to a hash"
-			
-			resource.merge(config_hash)
-			self.write_config_hash(resource, '/etc/puppet/test2.txt')	
-			
-			if (resource == config_hash)
-				Puppet.debug "Config file is in sync"
-			else
-				Puppet.debug "Config file in not in sync"
-				self.write_config_hash(config_hash, '/etc/puppet/test.txt')
-			end
-		else
-			Puppet.debug "Puppet was looking for " + file + " and coundn't find it"
-			raise Puppet::Error, "Puppet can't find %s config file" % @resource[:name]
-		end
+	# Current Values in the config file	
+	def current_values
+                @values ||= read_config
+        end
+
+        def bootproto
+        	current_values[:bootproto]
 	end
 
-	# Dumps the interface's config hash into the selected file
-	def write_config_hash(config_hash, filename)
-		config_file = File.new(filename, 'w')
-		config_hash.each_pair{ |key, value| config_file.write(value.nil? ? "" : key + '='+ value) } 
-		Puppet.debug "Wrote to #{filename}"
+        def bootproto=(value)
+                current_values[:bootproto] = value
+                @modified = true
+        end
+        
+	def onboot
+        	current_values[:onboot]
 	end
+
+        def onboot=(value)
+                current_values[:onboot] = value
+                @modified = true
+        end
+        
+        def netmask
+        	current_values[:netmask]
+	end
+
+        def netmask=(value)
+                current_values[:netmask] = value
+                @modified = true
+        end
+        
+	def network
+        	current_values[:network]
+	end
+
+        def network=(value)
+                current_values[:network] = value
+                @modified = true
+        end
+	
+	def broadcast
+		current_values[:broadcast]
+	end
+
+	def broadcast=(value)
+		current_values[:broadcast] = value
+		@modified = true
+	end
+	
+        def ipaddr
+        	current_values[:ipaddr]
+	end
+
+        def ipaddr=(value)
+                current_values[:ipaddr] = value
+                @modified = true
+        end
+	
+        def gateway
+        	current_values[:gateway]
+	end
+
+        def gateway=(value)
+                current_values[:gateway] = value
+                @modified = true
+        end
+
+        def hwaddr
+        	current_values[:hwaddr]
+	end
+
+        def hwaddr=(value)
+                current_values[:hwaddr] = value
+                @modified = true
+        end
+
+        def userctl
+        	current_values[:usrctl]
+	end
+
+        def userctl=(value)
+                current_values[:usrctl] = value
+                @modified = true
+        end
+
+        # Gathers the content in the config file and returns a hash of keys & values
+	def read_config
+                config_hash = {}
+                if File.exist?(Config_file)
+                        lines = File.new(Config_file, 'r').readlines
+	
+			# Redhat based config files use the format: KEY=value
+                        lines.each do |line|
+                                key = line.split('=')[0]
+				config_hash[key.upcase] = line.split('=')[1]
+                        end
+                        Puppet.debug "Imported config file to a hash"
+                        return config_hash
+                else
+                        Puppet.debug "Puppet was looking for " + Config_file + "and coundn't find it"
+                        raise Puppet::Error, "Puppet can't find the config file for %s" % @resource[:name]
+                        return nil
+                end
+        end
+
+	# Writes to the config file if @modified is true
+        def write_config
+		if @modified == true
+                        config_file = File.new(Config_file, 'w')
+                        @values.each_pair{ |key, value| config_file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}") } 
+                        Puppet.debug "Wrote to #{Config_file}"
+                else 
+                        Puppet.debug "Config file is in sync"
+                end
+        end
+
+	
+
 
 end
 

@@ -1,6 +1,7 @@
 Puppet::Type.type(:network_interface).provide(:debian) do
 	desc "Provider for debian network interfaces"
 
+	confine :operatingsystem => [:debian, :ubuntu]
 	defaultfor :operatingsystem => [:debian, :ubuntu]
 
 	has_features :manages_userctl
@@ -79,10 +80,97 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 			Puppet.debug "%s is already down" % [@resource[:name]]
 		end
 	end
+	
+	# Current values in the config file
+	def current_values
+                @values ||= read_config
+        end
 
-	#Parses the interface's config file
-	def parse_config_file
+        def bootproto
+                current_values[:bootproto]
+        end
 
+        def bootproto=(value)
+                current_values[:bootproto] = value
+                @modified = true
+        end
+
+        def onboot
+                current_values[:onboot]
+        end
+
+        def onboot=(value)
+                current_values[:onboot] = value
+                @modified = true
+        end
+
+        def netmask
+                current_values[:netmask]
+        end
+
+        def netmask=(value)
+                current_values[:netmask] = value
+	end
+        
+	def network
+                current_values[:network]
+        end
+
+        def network=(value)
+                current_values[:network] = value
+                @modified = true
+        end
+
+        def broadcast
+                current_values[:broadcast]
+        end
+        
+	def broadcast=(value)
+                current_values[:broadcast] = value
+                @modified = true
+        end
+
+        def ipaddr
+                current_values[:ipaddr]
+        end
+
+        def ipaddr=(value)
+                current_values[:ipaddr] = value
+        end
+   
+        def gateway
+                current_values[:gateway]
+        end
+
+        def gateway=(value)
+                current_values[:gateway] = value
+                @modified = true
+        end
+
+        def hwaddr
+                current_values[:hwaddr]
+        end
+
+        def hwaddr=(value)
+                current_values[:hwaddr] = value
+                @modified = true
+        end
+
+        def userctl
+                current_values[:usrctl]
+        end
+
+        def userctl=(value)
+                current_values[:usrctl] = value
+                @modified = true
+        end
+	
+	def read_config
+	
+	end
+	
+	def write_config
+	
 	end
 
 end
