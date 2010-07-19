@@ -91,45 +91,45 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 
 	# Current Values in the config file	
 	def current_values
-                @values ||= read_config
-        end
-
-        def bootproto
-        	current_values[:bootproto]
+		@values ||= read_config
 	end
 
-        def bootproto=(value)
-                current_values[:bootproto] = value
-                @modified = true
-        end
+	def bootproto
+		current_values[:bootproto]
+	end
+
+	def bootproto=(value)
+		current_values[:bootproto] = value
+		@modified = true
+	end
         
 	def onboot
         	current_values[:onboot]
 	end
-
-        def onboot=(value)
-                current_values[:onboot] = value
-                @modified = true
-        end
-        
-        def netmask
-        	current_values[:netmask]
-	end
-
-        def netmask=(value)
-                current_values[:netmask] = value
-                @modified = true
-        end
-        
-	def network
-        	current_values[:network]
-	end
-
-        def network=(value)
-                current_values[:network] = value
-                @modified = true
-        end
 	
+	def onboot=(value)
+		current_values[:onboot] = value
+		@modified = true
+	end
+
+	def netmask
+		current_values[:netmask]
+	end
+
+	def netmask=(value)
+		current_values[:netmask] = value
+		@modified = true
+	end
+
+	def network
+		current_values[:network]
+	end
+
+	def network=(value)
+		current_values[:network] = value
+		@modified = true
+	end
+
 	def broadcast
 		current_values[:broadcast]
 	end
@@ -138,77 +138,76 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 		current_values[:broadcast] = value
 		@modified = true
 	end
-	
-        def ipaddr
-        	current_values[:ipaddr]
+
+	def ipaddr
+		current_values[:ipaddr]
 	end
 
-        def ipaddr=(value)
-                current_values[:ipaddr] = value
-                @modified = true
-        end
-	
-        def gateway
-        	current_values[:gateway]
+	def ipaddr=(value)
+		current_values[:ipaddr] = value
+		@modified = true
 	end
 
-        def gateway=(value)
-                current_values[:gateway] = value
-                @modified = true
-        end
-
-        def hwaddr
-        	current_values[:hwaddr]
+	def gateway
+		current_values[:gateway]
 	end
 
-        def hwaddr=(value)
-                current_values[:hwaddr] = value
-                @modified = true
-        end
-
-        def userctl
-        	current_values[:usrctl]
+	def gateway=(value)
+		current_values[:gateway] = value
+		@modified = true
 	end
 
-        def userctl=(value)
-                current_values[:usrctl] = value
-                @modified = true
-        end
+	def hwaddr
+		current_values[:hwaddr]
+	end
 
-        # Gathers the content in the config file and returns a hash of keys & values
+	def hwaddr=(value)
+		current_values[:hwaddr] = value
+		@modified = true
+	end
+
+	def userctl
+		current_values[:usrctl]
+	end
+
+	def userctl=(value)
+		current_values[:usrctl] = value
+		@modified = true
+	end
+
+	# Gathers the content in the config file and returns a hash of keys & values
 	def read_config
-                config_hash = {}
-                if File.exist?(Config_file)
-                        lines = File.new(Config_file, 'r').readlines
-	
+		config_hash = {}
+		if File.exist?(Config_file)
+			lines = File.new(Config_file, 'r').readlines
+
 			# Redhat based config files use the format: KEY=value
-                        lines.each do |line|
-                                key = line.split('=')[0]
+			lines.each do |line|
+				key = line.split('=')[0]
 				config_hash[key.upcase] = line.split('=')[1]
-                        end
-                        Puppet.debug "Imported config file to a hash"
-                        return config_hash
-                else
-                        Puppet.debug "Puppet was looking for " + Config_file + "and coundn't find it"
-                        raise Puppet::Error, "Puppet can't find the config file for %s" % @resource[:name]
-                        return nil
-                end
-        end
+			end
+			Puppet.debug "Imported config file to a hash"
+			return config_hash
+		else
+			# Puppet could create the file if nil?
+			Puppet.debug "Puppet was looking for " + Config_file + "and coundn't find it"
+			raise Puppet::Error, "Puppet can't find the config file for %s" % @resource[:name]
+			return nil
+		end
+	end
 
 	# Writes to the config file if @modified is true
-        def write_config
+	def write_config
 		if @modified == true
-                        config_file = File.new(Config_file, 'w')
-                        @values.each_pair{ |key, value| config_file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}") } 
-                        Puppet.debug "Wrote to #{Config_file}"
-                else 
-                        Puppet.debug "Config file is in sync"
-                end
-        end
+			config_file = File.new(Config_file, 'w')
+			@values.each_pair{ |key, value| config_file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}") } 
+			Puppet.debug "Wrote to #{Config_file}"
+		else 
+			Puppet.debug "Config file is in sync"
+		end
+	end
 
 	
-
-
 end
 
 
