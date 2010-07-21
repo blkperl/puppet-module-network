@@ -7,18 +7,17 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 	has_features :manages_userctl
 	
 	@modified = false
-	Config_file = "/etc/sysconfig/network-scripts/ifcfg-eth0"
+	Config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name].to_s}"
 	commands :ip => "/sbin/ip"
 
 	# Manages the config file
 	def create
 		Puppet.debug "Configuring network %s" % [@resource[:name]]
-		self.write_config()
+		self.write_config
 	end
 
 	# Ensures state is up & device is configured
 	def up
-		self.read_config
 		self.device_up
 	end
 
@@ -206,8 +205,6 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 			Puppet.debug "Config file is in sync"
 		end
 	end
-
-	
 end
 
 
