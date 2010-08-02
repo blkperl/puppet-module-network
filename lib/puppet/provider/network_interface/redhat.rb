@@ -121,6 +121,14 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 		@modified = true
 	end
 
+  def domain
+    config_values[:DOMAIN]
+  end
+
+  def domain=(value)
+    config_values[:DOMAIN] = value
+  end
+
 	def userctl
 		config_values[:USRCTL]
 	end

@@ -161,6 +161,15 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 		@modified = true
 	end
 
+	def domain
+		current_values[:domain]
+	end
+
+	def domain=(value)
+		current_values[:domain] = value
+		@modified = true
+	end
+  
 	def userctl
 		current_values[:usrctl]
 	end
