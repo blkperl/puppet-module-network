@@ -5,48 +5,24 @@ module Puppet
 	Puppet::Type.newtype(:network_interface) do
 		@doc = "The network managment configuration type"
 
+    ensurable
+
 		# Devices have names
 		newparam(:device) do
 			isnamevar
 			desc "The network device to be configured"
 		end
+    
+    # Tells puppet not to modify the configuration file if set to true
+    newparam(:noconfig) do
+      newvalues(true, false)
+      defaultto(false)
+    end
 
-		ensurable do
-			desc "Device can be present, up, down, or absent
-
-			present: 
-		 		- creates/parses the config file, ignores the state
-			up:
-		 		- creates/parses the config file, makes sure the device is up
-			down:
-		 		- creates/parses the config file, makes sure the device is down
-			absent
-		 		- ignores the config file, makes sure the device is down"
-
-			defaultvalues    
-
-			newvalue(:present) do
-				provider.create
-			end     
-
-			newvalue(:up) do
-				provider.up
-			end     
-
-			newvalue(:down) do
-				provider.down
-			end     
-
-			newvalue(:absent) do
-				provider.absent
-			end
-
-			defaultto(:present) 
-
-			def retrieve 
-				provider.status
-			end 
-
+		# STATE of the interface
+		newproperty(:state) do
+			desc "state of the interface"
+			newvalues(:up, :down)
 		end
 
 		# Boot Prioty should default to dhcp
@@ -66,7 +42,6 @@ module Puppet
 		# Netmask
 		newproperty(:netmask) do
 			desc "Configure the netmask of the device"
-			defaultto("255.255.255.0")
 		end
 
 		# Network

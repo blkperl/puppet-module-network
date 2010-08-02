@@ -1,210 +1,183 @@
 Puppet::Type.type(:network_interface).provide(:redhat) do
 	desc "Provider for redhat network interfaces"
 
+  # For this provider puppet will use commands to configure the interface and
+  # modify the configuration file so that the device is still configured on boot
+
 	confine :operatingsystem => [:redhat, :fedora, :centos]
 	defaultfor :operatingsystem => [:redhat, :fedora, :centos]
 
 	has_features :manages_userctl
 	
 	@modified = false
-	Config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name].to_s}"
+
+  # ip command is preferred over ifconfig
 	commands :ip => "/sbin/ip"
 
-	# Manages the config file
-	def create
-		Puppet.debug "Configuring network %s" % [@resource[:name]]
-		self.write_config
-	end
-
-	# Ensures state is up & device is configured
-	def up
-		self.device_up
-	end
-
-	# Ensures state is down & device is configured
-	def down
-		self.device_down
-	end 
-
-	# Ensures puppet ignores this network interface
-	def absent
-		Puppet.debug "Making sure %s is absent " % [@resource[:name]]
-	end
-
-    	# Uses the ip command to determine if the device exists
-	def exists?
-		ip('link', 'list', @resource[:name])
-	rescue Puppet::ExecutionFailure
-		raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
-	end 
-
-	# Parses the ip command for the word UP 
-	def is_up?
+  # Ensurable/ensure adds unnecessary complexity to this provider
+  # Network interfaces are up or down, present/absent are unnecessary
+  def state
 		lines = ip('link', 'list', @resource[:name])
-		return lines.include?("UP")
-	end
+		if lines.include?("UP")
+      return "up"
+    else
+      return "down"
+    end 
+  end
 
-	# present | up | down | absent
-	def status
-		if exists?
-			if @resource[:ensure].to_s == "present" && @modified == false
-				Puppet.debug "%s state is present" % [@resource[:name]]
-                                return "present"
-                        elsif @resource[:ensure].to_s == "absent"
-                                Puppet.debug "%s is absent " % [@resource[:name]]
-                                return "absent"
-                        else
-                                if is_up?
-                                        Puppet.debug "%s state is up " % [@resource[:name]]
-                                        return "up"
-                                else
-                                        Puppet.debug "%s state is down " % [@resource[:name]]
-                                        return "down"
-                                end
-                        end
-		else
-  			Puppet.debug "%s is absent " % [@resource[:name]]
-  			return "absent"
-		end
-	end
+  # Set the interface's state
+  # Facter bug #2211 prevents puppet from bringing up network devices
+  def state=(value)
+		ip('link', 'set', @resource[:name], value)
+  end
 
-	# Two cases, device down, device already up
-	def device_up
-		if status.downcase == "down"
-			ip('link', 'set', @resource[:name], 'up')
-			Puppet.debug "Bringing %s up" % [@resource[:name]]
-		else
-			Puppet.debug " %s is already up" % [@resource[:name]]
-		end
-	end
+  # Uses the ip command to determine if the device exists
+	def exists?
+	 	@config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
+  	ip('link', 'list', @resource[:name])
+	rescue Puppet::ExecutionFailure
+	 	raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
+	end 
 
-	# Two cases, device up, device already down
-	def device_down
-		if status.downcase == "up"
-			ip('link', 'set', @resource[:name], 'down')
-			Puppet.debug "Bringing %s down" % [@resource[:name]]
-		else
-			Puppet.debug "%s is already down" % [@resource[:name]]
-		end
-	end
-
-	# Current Values in the config file	
-	def current_values
+	# Current values in /proc	
+	#def current_values
+	#	@values ||= read_proc
+	#end
+	
+	# Current values in the config file	
+  def config_values
 		@values ||= read_config
 	end
 
 	def bootproto
-		current_values[:bootproto]
+		config_values[:BOOTPROTO]
 	end
 
 	def bootproto=(value)
-		current_values[:bootproto] = value
+		config_values[:BOOTPROTO] = value
 		@modified = true
 	end
         
 	def onboot
-        	current_values[:onboot]
+    config_values[:ONBOOT]
 	end
 	
 	def onboot=(value)
-		current_values[:onboot] = value
+		config_values[:ONBOOT] = value
 		@modified = true
 	end
 
 	def netmask
-		current_values[:netmask]
+		config_values[:NETMASK]
 	end
 
 	def netmask=(value)
-		current_values[:netmask] = value
+		config_values[:NETMASK] = value
 		@modified = true
 	end
 
 	def network
-		current_values[:network]
+		config_values[:NETWORK]
 	end
 
 	def network=(value)
-		current_values[:network] = value
+		config_values[:NETWORK] = value
 		@modified = true
 	end
 
 	def broadcast
-		current_values[:broadcast]
+		config_values[:BROADCAST]
 	end
 
 	def broadcast=(value)
-		current_values[:broadcast] = value
+		config_values[:BROADCAST] = value
 		@modified = true
 	end
 
 	def ipaddr
-		current_values[:ipaddr]
+		config_values[:IPADDR]
 	end
 
 	def ipaddr=(value)
-		current_values[:ipaddr] = value
+		config_values[:IPADDR] = value
 		@modified = true
 	end
 
 	def gateway
-		current_values[:gateway]
+		config_values[:GATEWAY]
 	end
 
 	def gateway=(value)
-		current_values[:gateway] = value
+		config_values[:GATEWAY] = value
 		@modified = true
 	end
 
 	def hwaddr
-		current_values[:hwaddr]
+		config_values[:HWADDR]
 	end
 
 	def hwaddr=(value)
-		current_values[:hwaddr] = value
+		config_values[:HWADDR] = value
 		@modified = true
 	end
 
 	def userctl
-		current_values[:usrctl]
+		config_values[:USRCTL]
 	end
 
 	def userctl=(value)
-		current_values[:usrctl] = value
+		config_values[:USRCTL] = value
 		@modified = true
 	end
 
+  # Gets the current status of networking by parsing /proc
+  # FIXME Not implemented yet
+  def read_proc
+  end
+
 	# Gathers the content in the config file and returns a hash of keys & values
-	def read_config
+	# FIXME I eat comments for fun
+  def read_config
 		config_hash = {}
-		if File.exist?(Config_file)
-			lines = File.new(Config_file, 'r').readlines
+    puts @config_file.to_s
+		if File.exist?(@config_file.to_s)
+			lines = File.new(@config_file.to_s, 'r').readlines
 
 			# Redhat based config files use the format: KEY=value
 			lines.each do |line|
-				key = line.split('=')[0]
-				config_hash[key.upcase] = line.split('=')[1]
+				key = line.split('=')[0].chomp
+        if key.nil?
+				  config_hash[key.upcase.to_sym] = line.split('=')[1]
+          # FIXME I shouldn't have to do this
+        else
+          # I eat comments
+        end
 			end
+			
 			Puppet.debug "Imported config file to a hash"
 			return config_hash
 		else
-			# Puppet could create the file if nil?
-			Puppet.debug "Puppet was looking for " + Config_file + "and coundn't find it"
+			# TODO Puppet could create the file if nil?
+			Puppet.debug "Puppet was looking for #{@config_file.to_s} and coundn't find it"
 			raise Puppet::Error, "Puppet can't find the config file for %s" % @resource[:name]
 			return nil
 		end
 	end
-
+  
 	# Writes to the config file if @modified is true
-	def write_config
-		if @modified == true
-			config_file = File.new(Config_file, 'w')
-			@values.each_pair{ |key, value| config_file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}") } 
-			Puppet.debug "Wrote to #{Config_file}"
-		else 
-			Puppet.debug "Config file is in sync"
-		end
-	end
-end
+	# Doesn't modify the config file if :noconfig is set to true
+	def flush
+		#if @resouce[:noconfig] == false
+      if @modified == true
+	  		file = File.new(@config_file.to_s, 'w')
+		  	@values.each_pair{ |key, value| file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}\n") } 
+			  Puppet.debug "Flushed config values to  #{@config_file.to_s}"
+		  else 
+			  Puppet.debug "Config file does not need to be modified"
+		  end
+   # else
+      Puppet.debug ":noconfig set to %s, not modifing config file" % @resource[:noconfig]
+   # end
+  end
 
-
+end # End of redhat provider
