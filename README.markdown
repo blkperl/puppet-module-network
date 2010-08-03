@@ -20,7 +20,7 @@ control system and running:
 Usage
 -----
 
-Currently only supports redhat and debian based OS's
+Currently only supports redhat based OS's
 
 This is the full specification::
 
@@ -36,7 +36,8 @@ This is the full specification::
         gateway               => XXX.XXX.XXX.XXX        
         hwaddr                => XX:XX:XX:XX:XX:XX
         domain                => example.domain.com
-        ensure                => present | up | down | absent  
+        state                 => up | down
+        noconfig              => true | false
    }
 
   *  # ensure => up, implies onboot => yes
@@ -44,8 +45,17 @@ This is the full specification::
 
 TODO
 ----
-
+  *  Implement debian provider
   *  Add support for wireless interfaces
   *  Add support for static routes
   *  Add support for vlan tagging
   *  Add support for bridging
+  *  More puppet-spec tests!
+  *  Unit tests
+
+Testing
+-------
+  * 'cd puppet_spec'
+  * configure local_setup.sh
+  * run './puppet_spec'
+
