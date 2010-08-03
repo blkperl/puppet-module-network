@@ -87,7 +87,7 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 	end
 	
 	# Current values in the config file
-	def current_values
+	def config_values
 		@values ||= read_config
 	end
 
@@ -187,7 +187,7 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 			
 			# Debian base network interface files uses the format: key, value
 			lines.each do |line|
-				# Code that the parses the file
+				# FIXME Code that the parses the file
 			end
 			Puppet.debug "Imported config file into to a hash"
 			return config_hash
@@ -201,7 +201,7 @@ Puppet::Type.type(:network_interface).provide(:debian) do
 
 	# Writes to the config file if @modified is true
 	def write_config
-		if @modified = true
+		if @modified == true
 			config_file = File.new(Config_file, 'w')
 			# FIXME add write to file code
 			Puppet.debug "Wrote to #{Config_file}"
