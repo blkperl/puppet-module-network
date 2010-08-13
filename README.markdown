@@ -59,3 +59,10 @@ Testing
   * configure local_setup.sh
   * run './puppet_spec'
 
+Known Bugs
+----------
+* Puppet can't run when networking is down, however ralsh is uneffected which is why the puppet_spec test passes
+
+  http://projects.reductivelabs.com/issues/2211
+
+* the parser/flush method eats comments in the config file
