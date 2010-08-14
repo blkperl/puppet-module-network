@@ -47,10 +47,11 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 	# Current values in the config file	
   def config_values
 		@values ||= read_config
-    require 'pp'
-    pp @values
-    return @values
 	end
+
+  def device
+    config_values[:DEVICE]
+  end
 
 	def bootproto
 		config_values[:BOOTPROTO]
