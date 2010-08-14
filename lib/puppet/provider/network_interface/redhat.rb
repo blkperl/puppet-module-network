@@ -33,20 +33,23 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 
   # Uses the ip command to determine if the device exists
 	def exists?
-	 	@config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
+    @config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
   	ip('link', 'list', @resource[:name])
 	rescue Puppet::ExecutionFailure
 	 	raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
 	end 
 
 	# Current values in /proc	
-	#def current_values
-	#	@values ||= read_proc
-	#end
+	def current_values
+		@values ||= read_ip
+	end
 	
 	# Current values in the config file	
   def config_values
 		@values ||= read_config
+    require 'pp'
+    pp @values
+    return @values
 	end
 
 	def bootproto
@@ -146,20 +149,14 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 	# Gathers the content in the config file and returns a hash of keys & values
 	# FIXME I eat comments for fun
   def read_config
-		config_hash = {}
-    puts @config_file.to_s
+    config_hash = {}
 		if File.exist?(@config_file.to_s)
 			lines = File.new(@config_file.to_s, 'r').readlines
 
 			# Redhat based config files use the format: KEY=value
-			lines.each do |line|
+			lines.select {|l| l =~ /=/ }.each do |line|
 				key = line.split('=')[0].chomp
-        if key.nil?
-				  config_hash[key.upcase.to_sym] = line.split('=')[1]
-          # FIXME I shouldn't have to do this
-        else
-          # I eat comments
-        end
+				  config_hash[key.upcase.to_sym] = line.split('=')[1].chomp
 			end
 			
 			Puppet.debug "Imported config file to a hash"
@@ -184,7 +181,7 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
 			  Puppet.debug "Config file does not need to be modified"
 		  end
    # else
-      Puppet.debug ":noconfig set to %s, not modifing config file" % @resource[:noconfig]
+      #Puppet.debug ":noconfig set to %s, not modifing config file" % @resource[:noconfig]
    # end
   end
 
