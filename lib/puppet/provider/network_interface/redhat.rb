@@ -52,95 +52,20 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
   def device
     config_values[:DEVICE]
   end
-
-	def bootproto
-		config_values[:BOOTPROTO]
-	end
-
-	def bootproto=(value)
-		config_values[:BOOTPROTO] = value
-		@modified = true
-	end
-        
-	def onboot
-    config_values[:ONBOOT]
-	end
-	
-	def onboot=(value)
-		config_values[:ONBOOT] = value
-		@modified = true
-	end
-
-	def netmask
-		config_values[:NETMASK]
-	end
-
-	def netmask=(value)
-		config_values[:NETMASK] = value
-		@modified = true
-	end
-
-	def network
-		config_values[:NETWORK]
-	end
-
-	def network=(value)
-		config_values[:NETWORK] = value
-		@modified = true
-	end
-
-	def broadcast
-		config_values[:BROADCAST]
-	end
-
-	def broadcast=(value)
-		config_values[:BROADCAST] = value
-		@modified = true
-	end
-
-	def ipaddr
-		config_values[:IPADDR]
-	end
-
-	def ipaddr=(value)
-		config_values[:IPADDR] = value
-		@modified = true
-	end
-
-	def gateway
-		config_values[:GATEWAY]
-	end
-
-	def gateway=(value)
-		config_values[:GATEWAY] = value
-		@modified = true
-	end
-
-	def hwaddr
-		config_values[:HWADDR]
-	end
-
-	def hwaddr=(value)
-		config_values[:HWADDR] = value
-		@modified = true
-	end
-
-  def domain
-    config_values[:DOMAIN]
+  
+  CONFIG_KEYS = [ :BOOTPROTO, :ONBOOT, :NETMASK, :NETWORK, :BROADCAST, :IPADDR, 
+                  :GATEWAY, :HWADDR, :DOMAIN, :USRCTL ]
+  
+  CONFIG_KEYS.each do |config_key|
+    define_method(config_key.to_s.downcase) do
+      config_values[config_key]
+    end
+    
+    define_method("#{config_key}=".downcase) do |value|
+      config_values[config_key] = value
+  		@modified = true
+    end
   end
-
-  def domain=(value)
-    config_values[:DOMAIN] = value
-  end
-
-	def userctl
-		config_values[:USRCTL]
-	end
-
-	def userctl=(value)
-		config_values[:USRCTL] = value
-		@modified = true
-	end
 
   # Gets the current status of networking by parsing /proc
   # FIXME Not implemented yet
