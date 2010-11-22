@@ -2,8 +2,8 @@ require 'puppet'
 
 module Puppet
 
-  Puppet::Type.newtype(:network_interface) do
-    @doc = "The network managment configuration type"
+  Puppet::Type.newtype(:network_config) do
+    @doc = "The network configuration type"
 
     ensurable
 

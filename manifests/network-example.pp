@@ -1,7 +1,7 @@
 
 class network-example {
 
-  network_interface { "eth0":
+  network_config { "eth0":
     bootproto  => dhcp,
     onboot     => yes,
     netmask    => "255.255.255.0",
@@ -11,10 +11,9 @@ class network-example {
     hwaddr     => "AA:BB:CC:DD:FF",
     userctl    => no,
     domain     => "example.domain.com",
-    ensure     => up,
   }
 
-  network_interface { "eth1":
+  network_config { "eth1":
     bootproto => static,
     onboot    => no,
     netmask   => "255.255.255.0",
@@ -24,7 +23,6 @@ class network-example {
     hwaddr    => "FF:DD:CC:BB:AA",
     userctl   => yes,
     domain    => "example2.domain.com"
-    ensure    => up,
   }
 
 }

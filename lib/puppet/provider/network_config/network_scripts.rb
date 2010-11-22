@@ -1,35 +1,14 @@
-Puppet::Type.type(:network_interface).provide(:redhat) do
-  desc "Provider for redhat network interfaces"
+Puppet::Type.type(:network_config).provide(:network_scripts) do
+  desc "Provider for configuration of network_scripts"
 
-  # For this provider puppet will use commands to configure the interface and
-  # modify the configuration file so that the device is still configured on boot
-
-  confine :operatingsystem => [:redhat, :fedora, :centos]
   defaultfor :operatingsystem => [:redhat, :fedora, :centos]
 
   has_features :manages_userctl
-  
+
   @modified = false
 
   # ip command is preferred over ifconfig
   commands :ip => "/sbin/ip"
-
-  # Ensurable/ensure adds unnecessary complexity to this provider
-  # Network interfaces are up or down, present/absent are unnecessary
-  def state
-    lines = ip('link', 'list', @resource[:name])
-    if lines.include?("UP")
-      return "up"
-    else
-      return "down"
-    end 
-  end
-
-  # Set the interface's state
-  # Facter bug #2211 prevents puppet from bringing up network devices
-  def state=(value)
-    ip('link', 'set', @resource[:name], value)
-  end
 
   # Uses the ip command to determine if the device exists
   def exists?
@@ -39,11 +18,6 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
      raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
   end 
 
-  # Current values in /proc  
-  def current_values
-    @values ||= read_ip
-  end
-  
   # Current values in the config file  
   def config_values
     @values ||= read_config
@@ -61,7 +35,7 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
       config_values[config_key]
     end
     
-    define_method("#{config_key}=".downcase) do |value|
+  define_method("#{config_key}=".downcase) do |value|
       config_values[config_key] = value
       @modified = true
     end
@@ -100,4 +74,4 @@ Puppet::Type.type(:network_interface).provide(:redhat) do
       end
   end
 
-end # End of redhat provider
+end

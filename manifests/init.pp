@@ -1,7 +1,7 @@
 
 class puppet-network {
 
-  network_interface { "eth0":
+  network_config { "eth3":
     state     => "up",
     bootproto => "dhcp",
     onboot    => "yes",
