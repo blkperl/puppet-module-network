@@ -26,8 +26,8 @@ This is the full specification::
 
   # Device configuration
       network_interface  { "eth0":
-        bootproto             => none | static | dhcp   
-        onboot                => yes  | no	      
+        bootproto             => none | static | dhcp
+        onboot                => yes  | no
         network               => XXX.XXX.XXX.XXX
         netmask               => 255.255.255.0          
         broadcast             => XXX.XXX.XXX.XXX
@@ -40,9 +40,6 @@ This is the full specification::
         noconfig              => true | false
    }
 
-  *  # ensure => up, implies onboot => yes
-  *  # ensure => down, implies onboot => no
-
 TODO
 ----
   *  Implement debian provider
@@ -53,11 +50,6 @@ TODO
   *  More puppet-spec tests!
   *  Unit tests
 
-Testing
--------
-  * 'cd puppet_spec'
-  * configure local_setup.sh
-  * run './puppet_spec'
 
 Known Bugs
 ----------
@@ -65,4 +57,3 @@ Known Bugs
 
   http://projects.reductivelabs.com/issues/2211
 
-* the parser/flush method eats comments in the config file
