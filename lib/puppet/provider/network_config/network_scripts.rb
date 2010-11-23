@@ -18,7 +18,7 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
      raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
   end 
 
-  # Current values in the config file  
+  # Current values in the config file
   def config_values
     @values ||= read_config
   end
@@ -41,13 +41,13 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
     end
   end
 
-  # Gathers the content in the config file and returns a hash of keys & values
+  # Reads the content in the config file and returns a hash of keys & values
   def read_config
     config_hash = {}
     if File.exist?(@config_file.to_s)
       lines = File.new(@config_file.to_s, 'r').readlines
 
-      # Redhat based config files use the format: KEY=value
+      # Redhat based config files use the format: KEY="value"
       lines.select {|l| l =~ /=/ }.each do |line|
         key = line.split('=')[0].chomp
           config_hash[key.upcase.to_sym] = line.split('=')[1].chomp
@@ -63,11 +63,12 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
   end
   
   # Writes to the config file if @modified is true
-  # Doesn't modify the config file if :noconfig is set to true
   def flush
       if @modified == true
         file = File.new(@config_file.to_s, 'w')
-        @values.each_pair{ |key, value| file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}\n") } 
+        @values.each_pair { |key, value|
+          file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}\n") 
+        }
         Puppet.debug "Flushed config values to  #{@config_file.to_s}"
       else 
         Puppet.debug "Config file does not need to be modified"

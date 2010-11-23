@@ -25,31 +25,18 @@ Currently only supports redhat based OS's
 This is the full specification::
 
   # Device configuration
-      network_interface  { "eth0":
-        bootproto             => none | static | dhcp
-        onboot                => yes  | no
-        network               => XXX.XXX.XXX.XXX
-        netmask               => 255.255.255.0          
-        broadcast             => XXX.XXX.XXX.XXX
-        ipaddr                => XXX.XXX.XXX.XXX        
-        userctl               => yes | no
-        gateway               => XXX.XXX.XXX.XXX        
-        hwaddr                => XX:XX:XX:XX:XX:XX
-        domain                => example.domain.com
-        state                 => up | down
-        noconfig              => true | false
+      network_config    { "eth0":
+        bootproto             => none | static | dhcp,
+        onboot                => yes  | no,
+        network               => "XXX.XXX.XXX.XXX",
+        netmask               => "255.255.255.0",
+        broadcast             => "XXX.XXX.XXX.XXX",
+        ipaddr                => "XXX.XXX.XXX.XXX",
+        userctl               => yes | no,
+        gateway               => "XXX.XXX.XXX.XXX",
+        hwaddr                => "XX:XX:XX:XX:XX:XX",
+        domain                => "example.domain.com",
    }
-
-TODO
-----
-  *  Implement debian provider
-  *  Add support for wireless interfaces
-  *  Add support for static routes
-  *  Add support for vlan tagging
-  *  Add support for bridging
-  *  More puppet-spec tests!
-  *  Unit tests
-
 
 Known Bugs
 ----------

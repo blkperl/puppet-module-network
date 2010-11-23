@@ -1,8 +1,8 @@
 require 'puppet'
 require 'mocha'
-require '/etc/puppet/modules/puppet-network/lib/puppet/provider/network_interface/redhat.rb'
+require '/etc/puppet/modules/puppet-network/lib/puppet/provider/network_config/network_scripts.rb'
 
-provider_class = Puppet::Type.type(:network_interface).provider(:redhat)
+provider_class = Puppet::Type.type(:network_config).provider(:network_scripts)
 
 describe provider_class do
   before do
