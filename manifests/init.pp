@@ -7,4 +7,8 @@ class puppet-network {
     userctl   => yes,
   }
 
+  network_interface { "eth0":
+    state => "up",
+  }
+
 }

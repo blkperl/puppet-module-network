@@ -62,7 +62,7 @@ module Puppet
       desc "Configure the domain of the device"
     end
 
-    # USERCTL, doesn't work on solaris
+    # USERCTL, not supported on solaris
     newproperty(:userctl, :required_features => :manages_userctl) do
       desc "Non root users are allowed to control device if set to yes"
       newvalues(:yes, :no)
