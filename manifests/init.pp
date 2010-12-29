@@ -8,7 +8,7 @@ class puppet-network {
   }
 
   network_interface { "eth0":
-    state => "up",
+    state   => "up",
   }
 
 }

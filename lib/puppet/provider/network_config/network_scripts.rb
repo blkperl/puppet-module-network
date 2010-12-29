@@ -47,7 +47,6 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
     if File.exist?(@config_file.to_s)
       lines = File.new(@config_file.to_s, 'r').readlines
 
-      # Redhat based config files use the format: KEY="value"
       lines.select {|l| l =~ /=/ }.each do |line|
         key = line.split('=')[0].chomp
           config_hash[key.upcase.to_sym] = line.split('=')[1].chomp

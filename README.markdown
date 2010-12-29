@@ -1,6 +1,8 @@
 Puppet Network Management Module
 ================================
 
+Author: William Van Hevelingen <wvan13@gmail.com>
+
 Overview
 --------
 
@@ -20,27 +22,26 @@ control system and running:
 Usage
 -----
 
-Currently only supports redhat based OS's
+Currently only supports /etc/sysconfig/network-scripts parsing
 
 This is the full specification::
 
-  # Device configuration
-      network_config    { "eth0":
-        bootproto             => none | static | dhcp,
-        onboot                => yes  | no,
-        network               => "XXX.XXX.XXX.XXX",
-        netmask               => "255.255.255.0",
-        broadcast             => "XXX.XXX.XXX.XXX",
-        ipaddr                => "XXX.XXX.XXX.XXX",
-        userctl               => yes | no,
-        gateway               => "XXX.XXX.XXX.XXX",
-        hwaddr                => "XX:XX:XX:XX:XX:XX",
-        domain                => "example.domain.com",
-   }
+network_config { "eth0":
+    bootproto     => none | static | dhcp,
+    onboot        => yes  | no,
+    network       => "XXX.XXX.XXX.XXX",
+    netmask       => "255.255.255.0",
+    broadcast     => "XXX.XXX.XXX.XXX",
+    ipaddr        => "XXX.XXX.XXX.XXX",
+    userctl       => yes | no,
+    gateway       => "XXX.XXX.XXX.XXX",
+    hwaddr        => "XX:XX:XX:XX:XX:XX",
+    domain        => "example.domain.com",
+}
 
-Known Bugs
-----------
-* Puppet can't run when networking is down, however ralsh is uneffected which is why the puppet_spec test passes
+Requires that the ip command is present on the system
 
-  http://projects.reductivelabs.com/issues/2211
+  network_interface { "eth0":
+    state => "up"
+}
 
