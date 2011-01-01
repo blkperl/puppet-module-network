@@ -42,43 +42,63 @@ Puppet::Type.type(:network_interface).provide(:ip) do
   # FIXME Back Named Reference Captures are supported in Ruby 1.9.x
   def read_ip_output
     output = ip_output
-    ip_regex = Regexp.new('\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b')
-    ipv6_regex = Regexp.new('(?>[0-9,a-f,A-F]*\:{1,2})+[0-9,a-f,A-F]{0,4}\/\w+')
-    mac_regex  = Regexp.new('(?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}')
     lines = output.split("\n")
+    line1 = lines.shift
+    line2 = lines.shift
+    i=0
+    j=0
+    p=0
+   
+    # Magic happens here
+    lines.each do |line|
+      if line.include?("inet6")
+        lines[p] = lines[p] + lines[p+1]
+        lines.delete_at(p+1)
+      else
+        # move along, nothing to see here
+      end
+       p += 1 
+    end
+
+    # Scan the first line of the ip command output
+    line1.scan(/\d: (\w+): <(\w+),(\w+),(\w+),?(\w*)> mtu (\d+) qdisc (\w+) state (\w+)\s*\w* (\d+)*/)
+    values = {  
+      "device"    => $1,
+      "mtu"       => $6,
+      "qdisc"     => $7,
+      "state"     => $8,
+      "qlen"      => $9, 
+    }
     
-    values = {}
-    lines[0].scan(/\d: (\w+): <(\w+),(\w+),(\w+),(\w+)> mtu (\d+) qdisc (\w+) state (\w+) qlen (\d+)/)
-    line0 = { "device"          => $1,
-              "mtu"             => $6,
-              "qdisc"           => $7,
-              "state"           => $8,
-              "qlen"            => $9, }
-    values.update(line0)
+    # Scan the second line of the ip command output
+    line2.scan(/\s*link\/\w+ ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}) brd ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2})/) 
+    values["address"]   = $1
+    values["broadcast"] = $2 
+   
+    # Scan all the inet and inet6 entries
+    lines.each do |line|
+      if line.include?("inet6") 
+        line.scan(/\s*inet6 ((?>[0-9,a-f,A-F]*\:{1,2})+[0-9,a-f,A-F]{0,4})\/\w+ scope (\w+)\s*\w*\s*valid_lft (\w+) preferred_lft (\w+)/)
+        values["inet6_#{j}"] = { 
+          "ip"              => $1,
+          "scope"           => $2, 
+          "valid_lft"       => $3,
+          "preferred_lft"   => $4, 
+        }
+        j += 1
+      else
+        line.scan(/\s*inet (\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)\/\d+ b?r?d?\s*(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)?\s*scope (\w+) (\w+:?\d*)/)
+        values["inet_#{i}"] = { 
+          "ip"         => $1,
+          "brd"        => $2,
+          "scope"      => $3,
+          "dev"        => $4, 
+        }
+        i += 1
+      end
+    end
     
-    lines[1].scan(/\s*link\/ether ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}) brd ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2})/)
-    line1 = { "address"         => $1,
-              "broadcast"       => $2, }
-    values.update(line1)
-    
-    lines[2].scan(/\s*inet (\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b\/\d+) brd (\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b) scope (\w+) (\w+)/)
-    line2 = { "inet"            => $1,
-              "inet_brd"        => $2,
-              "inet_scope"      => $3,
-              "inet_dev"        => $4, }
-    values.update(line2)
-    
-    lines[3].scan(/\s*inet6 ((?>[0-9,a-f,A-F]*\:{1,2})+[0-9,a-f,A-F]{0,4}\/\w+) scope (\w+)/) 
-    line3 = { "inet6"           => $1,
-              "inet6_scope"     => $2, }
-    values.update(line3)
-    
-    lines[4].scan(/\s*valid_lft (\w+) preferred_lft (\w+)/)
-    line4 = { "valid_lft"       => $1,
-              "preferred_lft"   => $2, }
-    values.update(line4)
-    
-    return values
+  return values
 
   end
 
