@@ -26,15 +26,17 @@ Puppet::Type.type(:network_interface).provide(:ip) do
   end
 
   # Set the interface's state
-  # Facter bug #2211 prevents puppet from bringing up network devices
+  # FIXME Facter bug #2211 prevents puppet from bringing up network devices
   def state=(value)
     ip('link', 'set', @resource[:name], value)
   end
 
+  # Current state of the device via the ip command
   def state_values
     @values ||= read_ip_output
   end
 
+  # Return the ip output of the device
   def ip_output
     ip('addr','show', 'dev', @resource[:name])
   end
@@ -49,7 +51,7 @@ Puppet::Type.type(:network_interface).provide(:ip) do
     j=0
     p=0
    
-    # Magic happens here
+    # Append ipv6 lines into one string
     lines.each do |line|
       if line.include?("inet6")
         lines[p] = lines[p] + lines[p+1]
@@ -60,6 +62,7 @@ Puppet::Type.type(:network_interface).provide(:ip) do
        p += 1 
     end
 
+    #FIXME This should capture 'NOARP' and 'MULTICAST'
     # Scan the first line of the ip command output
     line1.scan(/\d: (\w+): <(\w+),(\w+),(\w+),?(\w*)> mtu (\d+) qdisc (\w+) state (\w+)\s*\w* (\d+)*/)
     values = {  
@@ -102,17 +105,18 @@ Puppet::Type.type(:network_interface).provide(:ip) do
 
   end
 
-  IP_ARGS = [ :arp, :multicast, :dynamic, :txquelen, :mtu, :address, :broadcast ]
-  
+  #FIXME Need to support multiple inet & inet6 hashes
+  IP_ARGS = [ "qlen", "mtu", "address", "broadcast" ]
+
   IP_ARGS.each do |ip_arg|
     define_method(ip_arg.to_s.downcase) do
       state_values[ip_arg]
     end
     
     define_method("#{ip_arg}=".downcase) do |value|
-      ip('link', 'set', 'dev', @resource[:name], "#{ip_arg}", value)
+      ip('link', 'set', "#{ip_arg}", value, 'dev', @resource[:name])
       state_values[ip_arg] = value
     end
   end
-
+  
 end

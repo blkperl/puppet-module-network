@@ -1,12 +1,13 @@
 require 'puppet'
 require 'ruby-debug'
 require 'mocha'
-require '/etc/puppet/modules/puppet-network/lib/puppet/provider/network_interface/ip.rb'
+require 'lib/puppet/provider/network_interface/ip.rb'
 
 
 provider_class = Puppet::Type.type(:network_interface).provider(:ip)
 
 describe provider_class do
+
   before do
     @resource = stub("resource", :name => "lo")
     @resource.stubs(:[]).with(:name).returns "lo"

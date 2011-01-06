@@ -52,7 +52,7 @@ module Puppet
       newvalues(:on, :off)  
     end
 
-    newproperty(:txquelen) do
+    newproperty(:qlen) do
       desc "txquelen"
     end
  
