@@ -24,24 +24,26 @@ Usage
 
 Currently only supports /etc/sysconfig/network-scripts parsing
 
-This is the full specification::
+Example Specs
 
 network_config { "eth0":
-    bootproto     => none | static | dhcp,
-    onboot        => yes  | no,
-    network       => "XXX.XXX.XXX.XXX",
+    bootproto     => "dhcp",
+    onboot        => "yes",
     netmask       => "255.255.255.0",
-    broadcast     => "XXX.XXX.XXX.XXX",
-    ipaddr        => "XXX.XXX.XXX.XXX",
-    userctl       => yes | no,
-    gateway       => "XXX.XXX.XXX.XXX",
-    hwaddr        => "XX:XX:XX:XX:XX:XX",
+    broadcast     => "192.168.56.255",
+    ipaddr        => "192.168.56.101",
+    userctl       => "no",
+    hwaddr        => "08:00:27:34:05:15",
     domain        => "example.domain.com",
 }
 
 Requires that the ip command is present on the system
 
   network_interface { "eth0":
-    state => "up"
+    state     => "up",
+    mtu       => "1000",
+    qlen      => "1500",
+    address   => "aa:bb:cc:dd:ee:ff",
+    broadcast => "ff:ff:ff:ff:ff:ff",
 }
 

@@ -7,8 +7,12 @@ class puppet-network {
     userctl   => yes,
   }
 
-  network_interface { "eth0":
-    state   => "up",
+  network_interface { "eth3":
+    state     => "up",
+    mtu       => "1111",
+    qlen      => "2000",
+    address   => "aa:bb:cc:dd:ee:ff",
+    broadcast => "ff:ff:ff:ff:ff:ff",
   }
 
 }

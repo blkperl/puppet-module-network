@@ -24,5 +24,13 @@ class network-example {
     userctl   => yes,
     domain    => "example2.domain.com"
   }
+  
+  network_interface { "eth3":
+    state     => "up",
+    mtu       => "1111",
+    qlen      => "2000",
+    address   => "aa:bb:cc:dd:ee:ff",
+    broadcast => "ff:ff:ff:ff:ff:ff",
+  }
 
 }
