@@ -61,7 +61,11 @@ module Puppet
     newparam(:type) do
       desc "Type of the device"
       newvalues(:ethernet, :bridge)
-      defaultto(:ethernet)
+    end
+
+    newparam(:vlan) do
+      desc "Is the device VLAN tagged (802.1q)"
+      newvalues(:yes, :no)
     end
 
     # XXX

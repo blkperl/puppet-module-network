@@ -48,7 +48,7 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
       config_hash[$1.strip.upcase.to_sym] = $2.strip
     end
 
-    Puppet.notice "Loaded file: #{@config_file}"
+    Puppet.debug "Loaded file: #{@config_file}"
     return config_hash
   end
 end
