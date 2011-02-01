@@ -12,47 +12,58 @@ module Puppet
       desc "The network device to be configured"
     end
 
-    newproperty(:bootproto) do
+    newparam(:bootproto) do
       desc "Boot priority for the network device"
       newvalues(:dhcp, :static, :none)
       defaultto(:dhcp)
     end
 
-    newproperty(:onboot) do
+    newparam(:onboot) do
       desc "Start the network device on boot" 
       newvalues(:yes, :no)
       defaultto(:yes)
     end
 
-    newproperty(:netmask) do
+    newparam(:netmask) do
       desc "Configure the netmask of the device"
     end
 
-    newproperty(:network) do
+    newparam(:network) do
       desc "Configure the network of the device"
     end
 
-    newproperty(:broadcast) do
+    newparam(:broadcast) do
       desc "Configure the broadcast of the device"
     end
 
-    newproperty(:ipaddr) do
+    newparam(:ipaddr) do
       desc "Configure the IP address of the device"
     end
 
-    newproperty(:gateway) do
+    newparam(:gateway) do
       desc "Configure the Gateway of the device"
     end
 
-    newproperty(:hwaddr) do
+    newparam(:hwaddr) do
       desc "Hardware address of the device"
     end
 
-    newproperty(:domain) do
+    newparam(:domain) do
       desc "Configure the domain of the device"
     end
 
-    newproperty(:userctl, :required_features => :manages_userctl) do
+    newparam(:bridge) do
+      desc "The bridge in which the device is enslaved (if any)"
+    end
+
+    newparam(:type) do
+      desc "Type of the device"
+      newvalues(:ethernet, :bridge)
+      defaultto(:ethernet)
+    end
+
+    # XXX
+    newparam(:userctl, :required_features => :manages_userctl) do
       desc "Non root users are allowed to control device if set to yes"
       newvalues(:yes, :no)
       defaultto(:no)
