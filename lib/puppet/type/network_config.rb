@@ -7,6 +7,8 @@ module Puppet
 
     ensurable
 
+    feature :manages_userctl, "When users can ifup/ifdown network devices."
+
     newparam(:device) do
       isnamevar
       desc "The network device to be configured"
