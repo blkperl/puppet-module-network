@@ -63,15 +63,15 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
   
   # Writes to the config file if @modified is true
   def flush
-      if @modified == true
-        file = File.new(@config_file.to_s, 'w')
+    if @modified == true
+      File.open(@config_file.to_s, 'w') do |file|
         @values.each_pair { |key, value|
-          file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}\n") 
+          file.write(value.nil? ? "#{key}\n" : "#{key}=#{value}\n")
         }
         Puppet.debug "Flushed config values to  #{@config_file.to_s}"
-      else 
-        Puppet.debug "Config file does not need to be modified"
       end
+    else
+      Puppet.debug "Config file does not need to be modified"
+    end
   end
-
 end
