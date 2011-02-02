@@ -5,7 +5,7 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
 
   has_features :manages_userctl
 
-  # Uses the ip command to determine if the device exists
+  # checks for network-script existence and correctness
   def exists?
     @config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
 
@@ -41,9 +41,8 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
     return nil unless File.exist?(@config_file)
 
     config_hash = {}
-    lines = File.readlines(@config_file)
 
-    lines.each do |line|
+    File.readlines(@config_file).each do |line|
       next unless line =~ /^\s*([A-Za-z][^=]+)="?([^"]+)"?$/
       config_hash[$1.strip.upcase.to_sym] = $2.strip
     end

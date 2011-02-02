@@ -26,8 +26,17 @@ module Puppet
       defaultto(:yes)
     end
 
+    newparam(:nozeroconf) do
+      desc "Skip zeroconf (aka local-link) configuration"
+      newvalues(:yes, :no)
+    end
+
     newparam(:netmask) do
-      desc "Configure the netmask of the device"
+      desc "Configure the subnetmask of the device"
+    end
+
+    newparam(:prefix) do
+      desc "Configure the network prefix, Has precedence over NETMASK on redhat."
     end
 
     newparam(:network) do
@@ -58,9 +67,23 @@ module Puppet
       desc "The bridge in which the device is enslaved (if any)"
     end
 
+    newparam(:peerdns) do
+      desc "modify /etc/resolv.conf if peer uses msdns extension (PPP only) or
+ DNS{1,2} are set, or if using dhclient. default to 'yes'."
+      newvalues(:yes, :no)
+    end
+
+    newparam(:dns1) do
+      desc "primary DNS server IPADDR"
+    end
+
+    newparam(:dns2) do
+      desc "secondary DNS server IPADDR"
+    end
+
     newparam(:type) do
       desc "Type of the device"
-      newvalues(:ethernet, :bridge)
+      newvalues(:Ethernet, :Bridge)
     end
 
     newparam(:vlan) do
