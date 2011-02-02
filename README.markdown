@@ -1,30 +1,32 @@
 Puppet Network Management Module
 ================================
 
-Author: William Van Hevelingen <wvan13@gmail.com>
+Authors: William Van Hevelingen <wvan13@gmail.com>
+         Elie Bleton <ebleton@heliostech.fr>
+	 Camille Meulien <cmeulien@heliostech.fr>
 
 Overview
 --------
 
-This module provides a type for network device configuration and management
+This module provides types for network device configuration and management
 
 Soure code
 ----------
 
 The source code for this module is available online at
-http://github.com/blkperl/puppet-network.git
+http://github.com/heliostech/puppet-network.git
 
 You can checkout the source code by installing the `git` distributed version
 control system and running:
 
-    git clone git://github.com/blkperl/puppet-network.git
+    git clone git://github.com/heliostech/puppet-network.git
 
 Usage
 -----
 
-Currently only supports /etc/sysconfig/network-scripts parsing
+Only redhat-like (RHEL,Fedora,CentOS) are currently supported.
 
-Example Specs
+The `network_config` type is used to maintain `/etc/sysconfig/network-scripts/ifcfg-*` files :
 
 network_config { "eth0":
     bootproto     => "dhcp",
@@ -37,9 +39,11 @@ network_config { "eth0":
     domain        => "example.domain.com",
 }
 
-Requires that the ip command is present on the system
+It has preliminary support for bridges and vlan attributes, configured as usual on redhat (samples could be eventually provided - mail heliostech if you actually need some).
 
-  network_interface { "eth0":
+The `network_interface` maintains live state of the interface using the `ip` tool, likewise :
+
+network_interface { "eth0":
     state     => "up",
     mtu       => "1000",
     qlen      => "1500",
@@ -47,3 +51,4 @@ Requires that the ip command is present on the system
     broadcast => "ff:ff:ff:ff:ff:ff",
 }
 
+Note: `network_interface` and `network_config` types are not dependant on each other in any way. `network_interface` is experimental.
