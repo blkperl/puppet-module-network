@@ -9,6 +9,9 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
   def exists?
     @config_file = "/etc/sysconfig/network-scripts/ifcfg-#{@resource[:name]}"
 
+    # do not check file contents if the purpose is to ensure the file isn't there
+    return File.exists?(@config_file) if @resource[:ensure] == :absent
+
     # load puppet configuration (`should`)
     @memory_values = {}
     @resource.to_hash.each_pair do |k, v|
@@ -38,7 +41,7 @@ Puppet::Type.type(:network_config).provide(:network_scripts) do
 
   # Reads the content in the config file and returns a hash of keys & values
   def load_disk_config
-    return nil unless File.exist?(@config_file)
+    return nil unless File.exists?(@config_file)
 
     config_hash = {}
 
