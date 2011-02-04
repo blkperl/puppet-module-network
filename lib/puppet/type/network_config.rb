@@ -67,6 +67,14 @@ module Puppet
       desc "The bridge in which the device is enslaved (if any)"
     end
 
+    newparam(:stp) do
+      desc "Enable STP (only applicable to type=Bridge devices)"
+    end
+
+    newparam(:delay) do
+      desc "Configure forward delay (only applicable to type=Bridge devices)"
+    end
+
     newparam(:peerdns) do
       desc "modify /etc/resolv.conf if peer uses msdns extension (PPP only) or
  DNS{1,2} are set, or if using dhclient. default to 'yes'."
@@ -83,7 +91,7 @@ module Puppet
 
     newparam(:type) do
       desc "Type of the device"
-      newvalues(:Ethernet, :Bridge)
+      newvalues(:Ethernet, :Bridge, :Bonding)
     end
 
     newparam(:vlan) do
@@ -91,13 +99,24 @@ module Puppet
       newvalues(:yes, :no)
     end
 
-    # XXX
     newparam(:userctl, :required_features => :manages_userctl) do
       desc "Non root users are allowed to control device if set to yes"
       newvalues(:yes, :no)
       defaultto(:no)
     end
 
+    newparam(:bonding_module_opts) do
+      desc "Configures bonding parameter"
+    end
+
+    newparam(:master) do
+      desc "Configures the bonding device to which the device is enslaved (set 'slave=>yes' too)"
+    end
+
+    newparam(:slave) do
+      desc "Configures whether or not the device is enslaved to a bonding device"
+      newvalues(:yes, :no)
+    end
   end
 
 end 
