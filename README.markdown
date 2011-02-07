@@ -1,11 +1,9 @@
 Puppet Network Management Module
 ================================
 
-Authors: 
-
-William Van Hevelingen <wvan13@gmail.com>
-Elie Bleton <ebleton@heliostech.fr>
-Camille Meulien <cmeulien@heliostech.fr>
+Authors: William Van Hevelingen <wvan13@gmail.com>
+         Elie Bleton <ebleton@heliostech.fr>
+	 Camille Meulien <cmeulien@heliostech.fr>
 
 Overview
 --------
@@ -16,12 +14,12 @@ Soure code
 ----------
 
 The source code for this module is available online at
-http://github.com/blkperl/puppet-network.git
+http://github.com/heliostech/puppet-network.git
 
 You can checkout the source code by installing the `git` distributed version
 control system and running:
 
-    git clone git://github.com/blkperl/puppet-network.git
+    git clone git://github.com/heliostech/puppet-network.git
 
 Usage
 -----
