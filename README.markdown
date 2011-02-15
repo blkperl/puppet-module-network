@@ -15,7 +15,7 @@ Note: `network_interface` and `network_config` types are not dependant on each o
 
 Ensure that you have a fallback ready before trying puppet-network, like physical access, a remote KVM, or similar devices so that you can restore connectivity in the event of configuration errors.
 
-## The `network_config` type
+## The 'network_config' type
 
 The `network_config` type is used to maintain persistent network configuration.
 Only redhat-derivatives (RHEL,Fedora,CentOS) are currently supported.
@@ -31,7 +31,7 @@ If you want `puppet-network` to leave your existing ifcfg files be, set `exclusi
 
 In non-exclusive mode, you get the freedom to handle ifcfg files the way you prefer. Be aware though, that *leaving behind unwanted devices can have very adverse effects* (broadcast issues, non-functionning bridges, defective bonding etc..) that won't be solved by rebooting the machine, probably requiring manual intervention to restore connectivity.
 
-#### `service network restart` issues
+#### 'service network restart' issues
 
 Phasing out a configuration is dangerous. `service network restart` will only shut down devices configured that are configured (ie with a matching file in `/etc/sysconfig/network-scripts`).
 
@@ -44,12 +44,6 @@ This can yield to problematic roll-outs, such as removing bridge devices. This w
  *   use puppet in offline mode, trigger a `service network stop` before applying configuration changes (puppet code left as an exercise ..), apply changes, then do `service network start`. (*not tested*)
  *   send patches for network_interface puppet type that can do the `brctl` (and ifenslave etc..) lifting.
  *   worst case scenario, reset your computer using any appropriate way
-
-#### Applying configuration changes
-
-As of now, you will need something like `service network restart` in your puppet configuration if configuration changes.
-This will only work if you did not remove devices from your configuration.
-We'd love to see a safer way to apply network configuration through puppet.
 
 ### Samples
 
@@ -112,7 +106,7 @@ network_config { "eth3": master => "bond0", slave => "yes" }
 
 See [kernel documentation for bonding](http://www.kernel.org/doc/Documentation/networking/bonding.txt) for more information.
 
-## The `network_interface` type
+## The 'network_interface' type
 
 The `network_interface` maintains live state of the interface using the `ip` tool, likewise :
 
