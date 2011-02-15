@@ -7,7 +7,15 @@ module Puppet
 
     ensurable
 
-    feature :manages_userctl, "When users can ifup/ifdown network devices."
+    newparam(:exclusive) do
+      d = "Enforces that no network configuration exists besides what puppet defines.\n"
+      d << "Enabled by default, set it to false in any resource to disable globally."
+      desc(d)
+
+      newvalues(:true, :false)
+      # this behaviorally defaults to true (see network_scripts.rb exists?()/initialize())
+      # using defaultto(:true) would prevent users from setting this to false
+    end
 
     newparam(:device) do
       isnamevar
@@ -21,7 +29,7 @@ module Puppet
     end
 
     newparam(:onboot) do
-      desc "Start the network device on boot" 
+      desc "Start the network device on boot"
       newvalues(:yes, :no)
       defaultto(:yes)
     end
@@ -99,7 +107,7 @@ module Puppet
       newvalues(:yes, :no)
     end
 
-    newparam(:userctl, :required_features => :manages_userctl) do
+    newparam(:userctl) do
       desc "Non root users are allowed to control device if set to yes"
       newvalues(:yes, :no)
       defaultto(:no)
@@ -118,5 +126,4 @@ module Puppet
       newvalues(:yes, :no)
     end
   end
-
-end 
+end
