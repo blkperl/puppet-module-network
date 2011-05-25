@@ -113,7 +113,7 @@ module Puppet
       defaultto(:no)
     end
 
-    newparam(:bonding_module_opts) do
+    newparam(:bonding_opts) do
       desc "Configures bonding parameter"
     end
 
