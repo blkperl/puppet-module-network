@@ -1,4 +1,5 @@
 require 'puppet'
+require 'ipaddr'
 
 module Puppet
 
@@ -15,10 +16,6 @@ module Puppet
     newproperty(:state) do
       desc "state of the interface"
       newvalues(:up, :down)
-    end
-
-    newproperty(:broadcast) do
-      desc "Configure the broadcast of the device"
     end
 
     newproperty(:inet) do
@@ -59,5 +56,33 @@ module Puppet
     newproperty(:mtu) do
       desc "mtu"
     end
+
+    newparam(:vlan) do
+      desc "Is the device VLAN tagged (802.1q)"
+      newvalues(:yes, :no)
+      defaultto(:no)
+    end
+
+
+    newproperty(:ipaddr) do
+      desc "Configure the IP address of the device"
+    end
+
+    newproperty(:netmask) do
+      desc "Configure the subnetmask of the device"
+
+      munge do |value|
+        if value.match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)
+          IPAddr.new(value).to_i.to_s(2).count("1").to_s
+        else
+          super
+        end
+      end
+    end
+
+    newproperty(:broadcast) do
+      desc "Configure the broadcast of the device"
+    end
+
   end
 end 
