@@ -1,15 +1,85 @@
 Puppet::Type.type(:network_interface).provide(:ip) do
 
   # ip command is preferred over ifconfig
-  commands :ip => "/sbin/ip"
+  commands :ip => "/sbin/ip", :vconfig => "/sbin/vconfig"
 
   # Uses the ip command to determine if the device exists
   def exists?
-    ip('link', 'list', @resource[:name])
+#    ip('link', 'list', @resource[:name])
+    ip('addr', 'show', 'label', @resource[:device]).include?("inet")
   rescue Puppet::ExecutionFailure
-     raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
+    return false
+#     raise Puppet::Error, "Network interface %s does not exist" % @resource[:name] 
   end 
+
+  def create
+    if @resource[:vlan] == :yes && ! ip('link', 'list').include?(@resource[:name].split(':').first)
+      # Create vlan device
+      vconfig('add', @resource[:device].split('.').first, @resource[:device].split('.').last)
+    end
+    unless self.netmask == @resource.should(:netmask) || self.broadcast == @resource.should(:broadcast) || self.ipaddr == @resource.should(:ipaddr)
+      ip_addr_flush
+      ip_addr_add
+    end
+  end
+
+  def destroy
+    ip_addr_flush
+    if @resource[:vlan] == :yes
+      # Test if no ip addresses are configured on this vlan device
+      if ! ip('addr', 'show', @resource[:device].split(':').first).include?("inet")
+        # Destroy vlan device
+        vconfig('rem', @resource[:device].split(':').first)
+      end
+    end
+  end
+
+
+ # NETMASK
+  def netmask
+    lines = ip('addr', 'show', 'label', @resource[:device])
+    lines.scan(/\s*inet (\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)\/(\d+) b?r?d?\s*(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)?\s*scope (\w+) (\w+:?\d*)/)
+    $2.nil? ? :absent : $2
+  end
+
+  def netmask=(value)
+    ip_addr_flush
+    ip_addr_add
+  end
+
+ # BROADCAST
+  def broadcast
+    lines = ip('addr', 'show', 'label', @resource[:device])
+    lines.scan(/\s*inet (\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)\/(\d+) b?r?d?\s*(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)?\s*scope (\w+) (\w+:?\d*)/)
+    $3.nil? ? :absent : $3
+  end
+
+  def broadcast=(value)
+    ip_addr_flush
+    ip_addr_add
+  end
+
+ # IPADDR
+  def ipaddr
+    lines = ip('addr', 'show', 'label', @resource[:device])
+    lines.scan(/\s*inet (\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)\/(\d+) b?r?d?\s*(\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b)?\s*scope (\w+) (\w+:?\d*)/)
+    $1.nil? ? :absent : $1
+  end
+
+  def ipaddr=(value)
+    ip_addr_flush
+    ip_addr_add
+  end
+
   
+  def ip_addr_flush
+    ip('addr', 'flush', 'dev', @resource[:device], 'label', @resource[:device].sub(/:/, '\:'))
+  end
+
+  def ip_addr_add
+    ip('addr', 'add', @resource[:ipaddr] + "/" + @resource[:netmask], 'broadcast', @resource[:broadcast], 'label', @resource[:device], 'dev', @resource[:device])
+  end
+
   def device
     config_values[:dev]
   end
@@ -106,7 +176,7 @@ Puppet::Type.type(:network_interface).provide(:ip) do
   end
 
   #FIXME Need to support multiple inet & inet6 hashes
-  IP_ARGS = [ "qlen", "mtu", "address", "broadcast" ]
+  IP_ARGS = [ "qlen", "mtu", "address" ]
 
   IP_ARGS.each do |ip_arg|
     define_method(ip_arg.to_s.downcase) do
