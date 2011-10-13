@@ -16,6 +16,7 @@ module Puppet
     newproperty(:state) do
       desc "state of the interface"
       newvalues(:up, :down)
+      defaultto(:up)
     end
 
     newproperty(:inet) do
