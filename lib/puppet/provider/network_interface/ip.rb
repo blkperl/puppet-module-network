@@ -21,6 +21,9 @@ Puppet::Type.type(:network_interface).provide(:ip) do
       ip_addr_flush
       ip_addr_add
     end
+    unless self.state == @resource.should(:state)
+      self.state=(@resource.should(:state))
+    end
   end
 
   def destroy
