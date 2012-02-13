@@ -1,8 +1,4 @@
-require 'puppet'
-require 'ruby-debug'
-require 'mocha'
-require 'lib/puppet/provider/network_interface/ip.rb'
-
+require 'spec_helper'
 
 provider_class = Puppet::Type.type(:network_interface).provider(:ip)
 
