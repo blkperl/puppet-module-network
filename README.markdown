@@ -2,6 +2,14 @@
 
 Network management for puppet
 
+## Deprecation Warning
+
+This module is no longer being maintained or updated.
+
+It has been supercededd by Adrien Thebo's module which can be found here:
+
+http://forge.puppetlabs.com/adrien/network
+
 ## Overview
 
 This module provides types for network management :
